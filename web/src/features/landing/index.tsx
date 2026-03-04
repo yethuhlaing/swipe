@@ -14,15 +14,9 @@ import { CTASection } from "../../features/landing/cta-section"
 import { ContactSection } from "../../features/landing/contact-section"
 import { FaqSection } from "../../features/landing/faq-section"
 import { LandingFooter } from "../../features/landing/footer"
-import {
-    LandingThemeCustomizer,
-    LandingThemeCustomizerTrigger,
-} from "../../features/landing/landing-theme-customizer"
 import { AboutSection } from "../../features/landing/about-section"
 
 export function LandingPageContent() {
-    const [themeCustomizerOpen, setThemeCustomizerOpen] = React.useState(false)
-
     return (
         <>
             {/* Navigation */}
@@ -46,15 +40,6 @@ export function LandingPageContent() {
 
             {/* Footer */}
             <LandingFooter />
-
-            {/* Theme Customizer */}
-            <LandingThemeCustomizerTrigger
-                onClick={() => setThemeCustomizerOpen(true)}
-            />
-            <LandingThemeCustomizer
-                open={themeCustomizerOpen}
-                onOpenChange={setThemeCustomizerOpen}
-            />
         </>
     )
 }

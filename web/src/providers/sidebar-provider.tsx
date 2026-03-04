@@ -1,12 +1,8 @@
 "use client"
 
 import { SidebarProvider as UISidebarProvider } from "@/components/ui/sidebar"
-import { ThemeCustomizer, ThemeCustomizerTrigger } from "@/components/theme"
-import { useState } from "react"
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
-    const [themeCustomizerOpen, setThemeCustomizerOpen] = useState(false)
-
     return (
         <UISidebarProvider
             style={
@@ -18,13 +14,6 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
             }
         >
             {children}
-            <ThemeCustomizerTrigger
-                onClick={() => setThemeCustomizerOpen(true)}
-            />
-            <ThemeCustomizer
-                open={themeCustomizerOpen}
-                onOpenChange={setThemeCustomizerOpen}
-            />
         </UISidebarProvider>
     )
 }

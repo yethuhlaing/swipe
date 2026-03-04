@@ -24,7 +24,7 @@ export default function RootLayout({
         >
             <body className={inter.className} suppressHydrationWarning>
                 <ThemeProvider
-                    defaultTheme="system"
+                    defaultTheme="light"
                     storageKey="nextjs-ui-theme"
                 >
                     <SidebarConfigProvider>{children}</SidebarConfigProvider>
