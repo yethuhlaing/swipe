@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(pnpm run build:*)",
+      "Bash(DATABASE_URL=\"postgresql://placeholder\" GOOGLE_CLIENT_ID=\"placeholder\" GOOGLE_CLIENT_SECRET=\"placeholder\" BETTER_AUTH_SECRET=\"placeholderplaceholderplaceholderplaceholder\" pnpm run build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(pnpm add:*)"
+    ]
+  }
+}

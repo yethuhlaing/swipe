@@ -1,0 +1,10 @@
+# Cursor AI Rules
+
+This project uses shared AI guidelines. Please read and follow the complete guidelines in:
+- `docs/AI_GUIDELINES.md` - Complete architecture and development guidelines
+
+Key points:
+- Prefer Server Actions over API routes for mutations
+- Use direct data fetching in Server Components over API routes
+- Only create API endpoints when absolutely necessary (webhooks, cron jobs, external APIs)
+- Follow the Next.js App Router best practices outlined in the guidelines
