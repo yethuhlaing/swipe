@@ -1,10 +1,29 @@
 # Cursor AI Rules
 
-This project uses shared AI guidelines. Please read and follow the complete guidelines in:
-- `docs/AI_GUIDELINES.md` - Complete architecture and development guidelines
+All project context lives in the **docs/** folder. Use it as the source of truth for product, architecture, and implementation.
 
-Key points:
-- Prefer Server Actions over API routes for mutations
-- Use direct data fetching in Server Components over API routes
-- Only create API endpoints when absolutely necessary (webhooks, cron jobs, external APIs)
-- Follow the Next.js App Router best practices outlined in the guidelines
+## Project context (docs/)
+
+- **docs/00-index.md** — Document map and quick reference (stack, pricing, feature tiers). Start here to find the right doc.
+- **docs/01-problem.md** — Problem space, pain points, market context.
+- **docs/02-product-overview.md** — What SWIPE is and is not, core principles, onboarding.
+- **docs/03-target-customer.md** — ICP, anti-ICP, jobs-to-be-done.
+- **docs/04-pipeline.md** — 7-stage wholesale funnel.
+- **docs/05-features.md** — Feature specs by module and tier ([All], [Growth], [Scale]).
+- **docs/06-integrations.md** — Integration stack.
+- **docs/07-pricing.md** — Pricing tiers and rationale.
+- **docs/08-technical-architecture.md** — Stack, AI layer, compliance.
+- **docs/09-roadmap.md** — Build roadmap and phases.
+- **docs/10-go-to-market.md** — Channels and traction.
+- **docs/11-competitive-positioning.md** — Competitor comparison.
+- **docs/12-risks.md** — Risks and mitigations.
+
+When making product, feature, or architecture decisions, read the relevant doc(s) in docs/ so work aligns with the spec.
+
+## Development guidelines
+
+- **docs/AI_GUIDELINES.md** — Architecture and dev patterns. Read and follow it.
+- Prefer **Server Actions** over API routes for mutations.
+- Use **direct data fetching** in Server Components; avoid API routes as a middleman.
+- Create **API endpoints** only when needed (webhooks, cron jobs, external APIs).
+- Follow **Next.js App Router** and patterns described in AI_GUIDELINES.md.
