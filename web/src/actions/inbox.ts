@@ -42,6 +42,46 @@ async function verifyTenantAccess(tenantId: string) {
 // ============================================================================
 
 /**
+ * Get recent conversations (for inbox sidebar, with unread indicator)
+ */
+export async function getRecentConversationsAction(tenantId: string, limit = 50) {
+    const access = await verifyTenantAccess(tenantId)
+    if (!access.authorized) {
+        return { success: false, error: access.error, conversations: [] }
+    }
+
+    try {
+        const results = await db
+            .select({
+                conversation: conversations,
+                buyer: {
+                    id: buyers.id,
+                    instagramUsername: buyers.instagramUsername,
+                    instagramName: buyers.instagramName,
+                    storeName: buyers.storeName,
+                    instagramProfilePic: buyers.instagramProfilePic,
+                },
+            })
+            .from(conversations)
+            .innerJoin(buyers, eq(buyers.id, conversations.buyerId))
+            .where(eq(conversations.tenantId, tenantId))
+            .orderBy(desc(conversations.lastMessageAt))
+            .limit(limit)
+
+        return {
+            success: true,
+            conversations: results.map((r) => ({
+                ...r.conversation,
+                buyer: r.buyer,
+            })),
+        }
+    } catch (error) {
+        console.error("Failed to get conversations:", error)
+        return { success: false, error: "Failed to load conversations", conversations: [] }
+    }
+}
+
+/**
  * Get conversations with unread messages
  */
 export async function getUnreadConversationsAction(tenantId: string) {
@@ -104,6 +144,7 @@ export async function getPendingDraftsAction(tenantId: string) {
                     instagramUsername: buyers.instagramUsername,
                     instagramName: buyers.instagramName,
                     storeName: buyers.storeName,
+                    instagramProfilePic: buyers.instagramProfilePic,
                 },
                 conversation: {
                     id: conversations.id,
@@ -130,6 +171,70 @@ export async function getPendingDraftsAction(tenantId: string) {
     } catch (error) {
         console.error("Failed to get drafts:", error)
         return { success: false, error: "Failed to load drafts", drafts: [] }
+    }
+}
+
+/**
+ * Get a single conversation with messages (for thread view)
+ */
+export async function getConversationWithMessagesAction(
+    tenantId: string,
+    conversationId: string
+) {
+    const access = await verifyTenantAccess(tenantId)
+    if (!access.authorized) {
+        return { success: false, error: access.error, conversation: null, messages: [] }
+    }
+
+    try {
+        const [convRow] = await db
+            .select({
+                conversation: conversations,
+                buyer: {
+                    id: buyers.id,
+                    instagramUsername: buyers.instagramUsername,
+                    instagramName: buyers.instagramName,
+                    storeName: buyers.storeName,
+                    instagramProfilePic: buyers.instagramProfilePic,
+                },
+            })
+            .from(conversations)
+            .innerJoin(buyers, eq(buyers.id, conversations.buyerId))
+            .where(
+                and(
+                    eq(conversations.tenantId, tenantId),
+                    eq(conversations.id, conversationId)
+                )
+            )
+            .limit(1)
+
+        if (!convRow) {
+            return { success: false, error: "Conversation not found", conversation: null, messages: [] }
+        }
+
+        const messageList = await db
+            .select()
+            .from(messages)
+            .where(
+                and(
+                    eq(messages.tenantId, tenantId),
+                    eq(messages.conversationId, conversationId)
+                )
+            )
+            .orderBy(messages.createdAt)
+            .limit(200)
+
+        return {
+            success: true,
+            conversation: {
+                ...convRow.conversation,
+                buyer: convRow.buyer,
+            },
+            messages: messageList,
+        }
+    } catch (error) {
+        console.error("Failed to get conversation:", error)
+        return { success: false, error: "Failed to load conversation", conversation: null, messages: [] }
     }
 }
 
