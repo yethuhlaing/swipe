@@ -11,9 +11,7 @@
 
 export * from "./tenants"
 export * from "./buyers"
-
-// Future modules:
-// export * from "./conversations"
-// export * from "./orders"
+export * from "./conversations"
+export * from "./orders"
 // export * from "./catalog"
 // export * from "./analytics"
