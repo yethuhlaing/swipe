@@ -1,6 +1,7 @@
 import { cache } from "react"
 import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
+import { getTenantByOwnerId } from "@/lib/data/tenants"
 
 export const getSession = cache(async () => {
     return await auth.api.getSession({
@@ -15,8 +16,16 @@ export const getCurrentUser = cache(async () => {
     if (!currentUser) return null
 
     return {
+        id: currentUser.id,
         name: currentUser.name ?? null,
         email: currentUser.email,
         image: currentUser.image ?? null,
     }
+})
+
+export const getCurrentTenant = cache(async () => {
+    const session = await getSession()
+    const userId = session?.user?.id
+    if (!userId) return null
+    return getTenantByOwnerId(userId)
 })

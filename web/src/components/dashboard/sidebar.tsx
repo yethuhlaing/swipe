@@ -51,9 +51,10 @@ interface DashboardSidebarProps extends React.ComponentProps<typeof Sidebar> {
         email: string
         image: string | null
     } | null
+    workspaceName?: string | null
 }
 
-export function DashboardSidebar({ user, ...props }: DashboardSidebarProps) {
+export function DashboardSidebar({ user, workspaceName, ...props }: DashboardSidebarProps) {
     const pathname = usePathname()
     const router = useRouter()
     const { isMobile } = useSidebar()
@@ -79,7 +80,7 @@ export function DashboardSidebar({ user, ...props }: DashboardSidebarProps) {
                                 <LogoImage
                                     variant="boxed"
                                     logoSize={24}
-                                    subtitle="Admin Dashboard"
+                                    subtitle={workspaceName ?? "Admin Dashboard"}
                                     showText={true}
                                     asLink={false}
                                     textSize="sm"

@@ -9,6 +9,7 @@ import {
     HelpCircle,
     CreditCard,
     Users,
+    Kanban,
 } from "lucide-react"
 
 export const navbarConfig = {
@@ -21,6 +22,11 @@ export const navbarConfig = {
         {
             label: "Dashboards",
             items: [
+                {
+                    title: "Pipeline",
+                    url: "/dashboard/pipeline",
+                    icon: Kanban,
+                },
                 {
                     title: "Dashboard 1",
                     url: "/dashboard",
