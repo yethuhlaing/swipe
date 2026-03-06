@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import {
     Phone,
     Video,
@@ -34,6 +35,8 @@ interface ChatHeaderProps {
     users: User[]
     onToggleMute?: () => void
     onToggleInfo?: () => void
+    /** Inbox mode: show "View profile" link to CRM */
+    buyerId?: string | null
 }
 
 export function ChatHeader({
@@ -41,6 +44,7 @@ export function ChatHeader({
     users,
     onToggleMute,
     onToggleInfo,
+    buyerId,
 }: ChatHeaderProps) {
     if (!conversation) {
         return (
@@ -149,6 +153,13 @@ export function ChatHeader({
 
             {/* Right side - Action buttons */}
             <div className="flex items-center gap-1">
+                {buyerId && (
+                    <Button variant="ghost" size="sm" asChild>
+                        <Link href={`/dashboard/crm/${buyerId}`}>
+                            View profile
+                        </Link>
+                    </Button>
+                )}
                 <TooltipProvider>
                     {/* Search */}
                     <Tooltip>

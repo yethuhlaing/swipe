@@ -147,7 +147,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
         // Apps
         { title: "Mail", url: "/mail", group: "Apps", icon: Mail },
         { title: "Tasks", url: "/tasks", group: "Apps", icon: CheckSquare },
-        { title: "Chat", url: "/chat", group: "Apps", icon: MessageCircle },
+        { title: "Chat", url: "/dashboard/chat", group: "Apps", icon: MessageCircle },
         { title: "Calendar", url: "/calendar", group: "Apps", icon: Calendar },
 
         // Auth Pages

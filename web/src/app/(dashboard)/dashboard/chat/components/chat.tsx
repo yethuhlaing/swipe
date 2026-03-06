@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { Menu, X } from "lucide-react"
 
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -9,20 +10,42 @@ import { ConversationList } from "./conversation-list"
 import { ChatHeader } from "./chat-header"
 import { MessageList } from "./message-list"
 import { MessageInput } from "./message-input"
+import { DraftReviewCard } from "./draft-review-card"
 import {
     useChat,
     type Conversation,
     type Message,
     type User,
 } from "../use-chat"
+import type { PendingDraft } from "./draft-review-card"
 
 interface ChatProps {
     conversations: Conversation[]
     messages: Record<string, Message[]>
     users: User[]
+    /** Inbox mode: selected conversation from URL (server-driven) */
+    selectedConversationId?: string | null
+    /** Inbox mode: when set, clicking a conversation navigates to /dashboard/chat?conversation=id */
+    useInboxNavigation?: boolean
+    /** Inbox mode: tenant id for draft actions */
+    tenantId?: string
+    /** Inbox mode: pending AI draft for the selected conversation */
+    pendingDraft?: PendingDraft | null
+    /** Inbox mode: called after approve/reject draft (e.g. router.refresh) */
+    onDraftResolved?: () => void
 }
 
-export function Chat({ conversations, messages, users }: ChatProps) {
+export function Chat({
+    conversations,
+    messages,
+    users,
+    selectedConversationId = null,
+    useInboxNavigation = false,
+    tenantId,
+    pendingDraft,
+    onDraftResolved,
+}: ChatProps) {
+    const router = useRouter()
     const {
         selectedConversation,
         setSelectedConversation,
@@ -55,39 +78,54 @@ export function Chat({ conversations, messages, users }: ChatProps) {
         }
     }, [])
 
-    // Initialize data
+    // Initialize data (and sync when props change, e.g. inbox URL change)
     useEffect(() => {
         setConversations(conversations)
         setUsers(users)
-
-        // Set messages for all conversations
         Object.entries(messages).forEach(
             ([conversationId, conversationMessages]) => {
                 setMessages(conversationId, conversationMessages)
             }
         )
-
-        // Auto-select first conversation if none selected
-        if (!selectedConversation && conversations.length > 0) {
+        if (useInboxNavigation && selectedConversationId !== undefined) {
+            setSelectedConversation(selectedConversationId)
+        } else if (
+            !useInboxNavigation &&
+            !selectedConversation &&
+            conversations.length > 0
+        ) {
             setSelectedConversation(conversations[0].id)
         }
     }, [
         conversations,
         messages,
         users,
-        selectedConversation,
+        useInboxNavigation,
+        selectedConversationId,
         setConversations,
         setMessages,
         setUsers,
         setSelectedConversation,
     ])
 
+    const effectiveSelected = useInboxNavigation
+        ? selectedConversationId
+        : selectedConversation
     const currentConversation = conversations.find(
-        (conv) => conv.id === selectedConversation
+        (conv) => conv.id === effectiveSelected
     )
-    const currentMessages = selectedConversation
-        ? messages[selectedConversation] || []
+    const currentMessages = effectiveSelected
+        ? messages[effectiveSelected] || []
         : []
+
+    const handleSelectConversation = (id: string) => {
+        if (useInboxNavigation) {
+            router.push(`/dashboard/chat?conversation=${id}`)
+        } else {
+            setSelectedConversation(id)
+        }
+        setIsSidebarOpen(false)
+    }
 
     const handleSendMessage = (content: string) => {
         if (!selectedConversation) return
@@ -148,11 +186,8 @@ export function Chat({ conversations, messages, users }: ChatProps) {
 
                     <ConversationList
                         conversations={conversations}
-                        selectedConversation={selectedConversation}
-                        onSelectConversation={(id) => {
-                            setSelectedConversation(id)
-                            setIsSidebarOpen(false) // Close sidebar on mobile after selection
-                        }}
+                        selectedConversation={effectiveSelected}
+                        onSelectConversation={handleSelectConversation}
                     />
                 </div>
 
@@ -175,18 +210,30 @@ export function Chat({ conversations, messages, users }: ChatProps) {
                                 conversation={currentConversation || null}
                                 users={users}
                                 onToggleMute={handleToggleMute}
+                                buyerId={currentConversation?.buyerId}
                             />
                         </div>
                     </div>
 
                     {/* Messages */}
                     <div className="flex-1 flex flex-col min-h-0">
-                        {selectedConversation ? (
+                        {effectiveSelected ? (
                             <>
                                 <MessageList
                                     messages={currentMessages}
                                     users={users}
                                 />
+
+                                {/* Inbox: AI draft review */}
+                                {tenantId && pendingDraft && onDraftResolved && (
+                                    <div className="border-t px-4 py-3 bg-muted/20">
+                                        <DraftReviewCard
+                                            draft={pendingDraft}
+                                            tenantId={tenantId}
+                                            onResolved={onDraftResolved}
+                                        />
+                                    </div>
+                                )}
 
                                 {/* Message Input */}
                                 <MessageInput

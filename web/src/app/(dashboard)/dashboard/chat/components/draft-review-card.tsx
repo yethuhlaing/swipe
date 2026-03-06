@@ -5,10 +5,22 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Check, X, Pencil, Sparkles } from "lucide-react"
 import { DraftEditor } from "./draft-editor"
-import type { DraftWithMeta } from "./inbox-types"
+import type { AiDraft } from "@/db/schema"
+
+/** Draft with buyer + conversation meta (matches getPendingDraftsAction result) */
+export interface PendingDraft extends AiDraft {
+    buyer: {
+        id: string
+        instagramUsername: string | null
+        instagramName: string | null
+        storeName: string | null
+        instagramProfilePic: string | null
+    }
+    conversation: { id: string; lastMessagePreview: string | null }
+}
 
 interface DraftReviewCardProps {
-    draft: DraftWithMeta
+    draft: PendingDraft
     tenantId: string
     onResolved: () => void
 }

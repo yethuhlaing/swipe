@@ -331,7 +331,7 @@ export async function approveDraftAction(
         // TODO: Actually send the message via Meta API
         // This will be implemented when Meta API integration is complete
 
-        revalidatePath("/dashboard/inbox")
+        revalidatePath("/dashboard/chat")
 
         return { success: true, messageId: message.id }
     } catch (error) {
@@ -378,7 +378,7 @@ export async function rejectDraftAction(tenantId: string, draftId: string) {
             data: { draftId },
         })
 
-        revalidatePath("/dashboard/inbox")
+        revalidatePath("/dashboard/chat")
 
         return { success: true }
     } catch (error) {

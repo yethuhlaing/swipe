@@ -59,7 +59,7 @@ export const navbarConfig = {
                 },
                 {
                     title: "Chat",
-                    url: "/chat",
+                    url: "/dashboard/chat",
                     icon: MessageCircle,
                 },
                 {

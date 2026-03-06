@@ -167,7 +167,7 @@ export function getBuyerTableColumns(): ColumnDef<BuyerWithStage>[] {
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild className="cursor-pointer">
-                                <Link href={`/dashboard/inbox?buyer=${buyer.id}`}>
+                                <Link href={`/dashboard/chat?buyer=${buyer.id}`}>
                                     Open thread
                                 </Link>
                             </DropdownMenuItem>

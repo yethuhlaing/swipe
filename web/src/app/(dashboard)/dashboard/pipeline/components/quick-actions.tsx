@@ -42,7 +42,7 @@ export function QuickActions({
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                         <Link
-                            href={`/dashboard/inbox?buyer=${buyerId}`}
+                            href={`/dashboard/chat?buyer=${buyerId}`}
                             className="flex items-center gap-2"
                             onClick={onOpenThread}
                         >

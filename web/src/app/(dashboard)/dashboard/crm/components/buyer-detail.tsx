@@ -138,7 +138,7 @@ export function BuyerDetail({
                                 </span>
                             )}
                             <Button variant="link" className="h-auto p-0 text-sm" asChild>
-                                <Link href={`/dashboard/inbox?buyer=${buyer.id}`}>
+                                <Link href={`/dashboard/chat?buyer=${buyer.id}`}>
                                     <MessageSquare className="h-4 w-4 mr-1 inline" />
                                     Open thread
                                 </Link>

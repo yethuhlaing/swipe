@@ -215,6 +215,12 @@ export function ConversationList({
                                         {conversation.lastMessage.content}
                                     </p>
 
+                                    {/* Pending draft badge (inbox) */}
+                                    {(conversation.pendingDraftCount ?? 0) > 0 && (
+                                        <span className="shrink-0 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-medium px-1.5 py-0.5">
+                                            Draft
+                                        </span>
+                                    )}
                                     {/* Unread count */}
                                     {conversation.unreadCount > 0 && (
                                         <Badge

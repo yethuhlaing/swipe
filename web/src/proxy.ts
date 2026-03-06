@@ -32,7 +32,6 @@ export const config = {
         "/dashboard/:path*",
         "/dashboard-2/:path*",
         "/calendar/:path*",
-        "/chat/:path*",
         "/mail/:path*",
         "/tasks/:path*",
         "/users/:path*",

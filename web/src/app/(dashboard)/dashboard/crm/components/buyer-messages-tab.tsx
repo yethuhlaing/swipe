@@ -24,7 +24,7 @@ export function BuyerMessagesTab({ messages, buyer }: BuyerMessagesTabProps) {
                         No messages in this thread yet.
                     </p>
                     <Button variant="outline" size="sm" className="mt-3" asChild>
-                        <Link href={`/dashboard/inbox?buyer=${buyer.id}`}>
+                        <Link href={`/dashboard/chat?buyer=${buyer.id}`}>
                             Open in Inbox
                         </Link>
                     </Button>
@@ -38,7 +38,7 @@ export function BuyerMessagesTab({ messages, buyer }: BuyerMessagesTabProps) {
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
                 <CardTitle>DM thread</CardTitle>
                 <Button variant="outline" size="sm" asChild>
-                    <Link href={`/dashboard/inbox?buyer=${buyer.id}`}>
+                    <Link href={`/dashboard/chat?buyer=${buyer.id}`}>
                         Open in Inbox
                     </Link>
                 </Button>

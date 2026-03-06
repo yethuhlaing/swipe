@@ -43,6 +43,10 @@ export interface Conversation {
     unreadCount: number
     isPinned: boolean
     isMuted: boolean
+    /** Inbox mode: buyer id for "View profile" link */
+    buyerId?: string
+    /** Inbox mode: pending AI draft count for this conversation */
+    pendingDraftCount?: number
 }
 
 interface ChatState {
