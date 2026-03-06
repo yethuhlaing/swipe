@@ -117,6 +117,11 @@ export async function listBuyers(
         )
     }
 
+    if (tags?.length) {
+        // jsonb ?| text[] — overlap: buyer has at least one of the selected tags
+        conditions.push(sql`${buyers.tags} ?| ${tags}::text[]`)
+    }
+
     // Build order by
     const orderColumn = {
         lastActivity: buyers.lastActivityAt,

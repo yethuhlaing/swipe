@@ -28,6 +28,11 @@ export const navbarConfig = {
                     icon: Kanban,
                 },
                 {
+                    title: "Buyers",
+                    url: "/dashboard/crm",
+                    icon: Users,
+                },
+                {
                     title: "Dashboard 1",
                     url: "/dashboard",
                     icon: LayoutDashboard,
