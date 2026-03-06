@@ -4,6 +4,7 @@ This document contains architectural decisions and best practices for AI assista
 
 ## Table of Contents
 - [API Routes vs Server Actions](#api-routes-vs-server-actions)
+- [Event-Driven Architecture (Trigger.dev)](#event-driven-architecture-triggerdev)
 - [Project Architecture](#project-architecture)
 - [Code Style](#code-style)
 
@@ -93,27 +94,44 @@ export default async function DashboardPage() {
 - Public APIs for third parties
 
 **2. Webhooks from External Services**
+- Webhooks must return 200 quickly (e.g. Meta requires &lt; 1s). Do **not** do heavy work in the request.
+- Verify signature, parse payload, then **trigger a Trigger.dev task** and return 200. Let the task do DB writes, AI calls, and external API calls.
+
 ```typescript
-// ✅ CORRECT: Webhooks need public HTTP endpoints
-// app/api/webhooks/stripe/route.ts
+// ✅ CORRECT: Webhook verifies, enqueues to Trigger.dev, returns 200
+// app/api/webhooks/meta/route.ts
+import { tasks } from "@/trigger";
+
 export async function POST(req: Request) {
-  const signature = req.headers.get('stripe-signature');
-  // Verify and process webhook
+  const signature = req.headers.get("x-hub-signature-256");
+  if (!verifyMetaSignature(req.body, signature)) {
+    return new Response("Invalid", { status: 401 });
+  }
+  const payload = await req.json();
+  await tasks.trigger("inbox.process", { payload });
+  return new Response("OK", { status: 200 });
 }
 ```
 
 **3. Cron Jobs / Scheduled Tasks**
+- Prefer **Trigger.dev scheduled tasks** for recurring work (reorder checks, digest emails, cleanup). They run on Trigger.dev's schedule and don't consume Vercel function time.
+- Use Vercel Cron HTTP endpoints only when you need a simple cron that calls an API route (e.g. to trigger a Trigger.dev task or run very fast logic).
+
 ```typescript
-// ✅ CORRECT: Vercel Cron needs HTTP endpoints
+// ✅ CORRECT: Trigger.dev task with schedule (preferred for heavy or recurring work)
+// trigger/inbox.ts
+export const reorderCheck = task({
+  id: "reorder-check",
+  run: async (payload) => { /* ... */ },
+});
+
+// Or Vercel Cron that triggers a task / runs quick logic
 // app/api/cron/cleanup/route.ts
 export async function GET(req: Request) {
-  // Verify cron secret
-  if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 });
+  if (req.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response("Unauthorized", { status: 401 });
   }
-
-  // Cleanup logic
-  await cleanupOldRecords();
+  await tasks.trigger("cleanup.unverified", {});
   return Response.json({ success: true });
 }
 ```
@@ -132,12 +150,35 @@ export async function GET(req: Request) {
 ```
 Need to perform an operation?
 ├─ Is it called by external service? → API Route
-├─ Is it a webhook? → API Route
-├─ Is it a cron job? → API Route
+├─ Is it a webhook? → API Route (verify → trigger Trigger.dev task → return 200)
+├─ Is it a cron/scheduled job? → Trigger.dev task (or Vercel Cron that triggers a task)
 ├─ Is it a form submission/mutation? → Server Action
 ├─ Is it data fetching for UI? → Direct in Server Component
 └─ Is it client-side data fetching? → Consider Server Action or RSC
 ```
+
+---
+
+## Event-Driven Architecture (Trigger.dev)
+
+Background and async work (webhook processing, reorders, AI drafting, follow-up sequences) runs on **Trigger.dev**, not inside Vercel serverless. This keeps webhooks fast and avoids timeouts.
+
+### When to use Trigger.dev
+
+- **Webhook payload processing** — After a webhook route returns 200, trigger a task to process the payload (DB writes, AI, external APIs).
+- **Scheduled work** — Reorder checks, digest emails, cleanup. Define tasks with cron or interval in Trigger.dev.
+- **User-triggered async work** — e.g. "generate catalog" or "bulk export" that can run in the background.
+
+### Patterns
+
+1. **Webhooks:** In the API route: verify → `tasks.trigger("task.id", { payload })` → return 200. Implement the actual logic in the Trigger.dev task.
+2. **From Server Actions:** For long-running or fire-and-forget work, call `tasks.trigger(...)` from a Server Action; don't await the full job if the UI doesn't need to wait.
+3. **Task definitions:** Keep task handlers in `trigger/` (or similar) and register them with the Trigger.dev SDK. Use the same DB, env, and types as the Next.js app.
+
+### What not to do
+
+- Don't run heavy work (OpenAI, multi-step flows, large DB writes) inside the webhook request.
+- Don't use a separate worker container (e.g. BullMQ on Railway) for these jobs; Trigger.dev is the chosen event-driven layer.
 
 ---
 
@@ -146,10 +187,11 @@ Need to perform an operation?
 ### Tech Stack
 - **Framework**: Next.js 15+ (App Router)
 - **Auth**: Better Auth
-- **Database**: PostgreSQL with Prisma
+- **Database**: PostgreSQL with Drizzle
 - **Styling**: Tailwind CSS
 - **Email**: Resend
-- **Deployment**: Vercel
+- **Deployment**: Vercel (single app)
+- **Background jobs**: Trigger.dev (event-driven; no separate worker container)
 
 ### Folder Structure
 ```
@@ -160,15 +202,16 @@ web/
 │   │   ├── (marketing)/     # Public marketing pages
 │   │   ├── dashboard/       # Protected dashboard
 │   │   └── api/
-│   │       ├── webhooks/    # External webhooks (Stripe, etc.)
-│   │       └── cron/        # Scheduled tasks
+│   │       ├── webhooks/    # External webhooks (Meta, Shopify, etc.) → trigger Trigger.dev
+│   │       └── cron/        # Vercel Cron (optional; can trigger Trigger.dev tasks)
 │   ├── actions/             # Server Actions (prefer this)
 │   ├── components/
 │   ├── lib/
 │   │   ├── auth.ts          # Better Auth setup
-│   │   ├── db.ts            # Prisma client
+│   │   ├── db.ts            # Drizzle client
 │   │   ├── email.ts         # Email utilities
 │   │   └── rate-limit.ts    # Rate limiting
+│   ├── trigger/             # Trigger.dev task definitions (inbox, orders, reorders, etc.)
 │   └── hooks/               # React hooks
 ```
 
@@ -183,17 +226,21 @@ web/
    - Use React Server Components (RSC) by default
    - Mark components as `'use client'` only when needed (interactivity, hooks, etc.)
 
-3. **Type Safety**
+3. **Webhooks and background work**
+   - Webhook API routes: verify request, trigger a Trigger.dev task with the payload, return 200 immediately.
+   - Put processing logic (DB, AI, external APIs) in Trigger.dev tasks, not in the webhook handler.
+
+4. **Type Safety**
    - Use TypeScript strictly
    - Define Zod schemas for validation
-   - Use Prisma types for database operations
+   - Use Drizzle types for database operations
 
-4. **Error Handling**
+5. **Error Handling**
    - Use `try/catch` in Server Actions
    - Return structured error objects: `{ success: false, error: string }`
    - Use `redirect()` for navigation after mutations
 
-5. **Rate Limiting**
+6. **Rate Limiting**
    - Apply rate limiting to public endpoints
    - Use the `@/lib/rate-limit` utilities
    - Protect auth endpoints and public forms

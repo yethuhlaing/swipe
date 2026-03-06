@@ -6,31 +6,32 @@ SWIPE is a standard multi-tenant SaaS. Each brand's data is isolated by tenant I
 
 ## Stack Overview
 
+**Architecture: Single Next.js app on Vercel + Trigger.dev for event-driven background jobs.** No separate backend container; webhooks and app logic live in Next.js; long-running or async work runs on Trigger.dev.
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        SWIPE Frontend                           │
+│                     SWIPE (Next.js on Vercel)                    │
 │              Next.js 15 · Tailwind · shadcn/ui                  │
 │         Real-time inbox via WebSockets (Supabase Realtime)      │
+│         Server Actions · API Routes (webhooks, cron)            │
 └──────────────────────────┬──────────────────────────────────────┘
-                           │ API calls
-┌──────────────────────────▼──────────────────────────────────────┐
-│                      SWIPE API Layer                             │
-│              Node.js / TypeScript · REST + WebSocket             │
-│              Auth: Supabase Auth + JWT                           │
-└──────┬─────────────┬─────────────┬──────────────────────────────┘
-       │             │             │
-┌──────▼──────┐ ┌────▼────┐ ┌─────▼──────┐
-│  PostgreSQL  │ │  Redis  │ │  BullMQ    │
-│ (Supabase)  │ │  Cache  │ │  Job Queue │
-│  RLS tenants│ │  Rate   │ │  Reorders  │
-│             │ │  Limits │ │  AI Tasks  │
-└─────────────┘ └─────────┘ └────────────┘
+                           │
+         ┌─────────────────┼─────────────────┐
+         │                 │                 │
+┌────────▼────────┐ ┌──────▼──────┐ ┌───────▼────────┐
+│   PostgreSQL    │ │    Redis     │ │  Trigger.dev    │
+│  (Supabase)     │ │  (Upstash)   │ │  Event-driven   │
+│  RLS tenants    │ │  Rate limits │ │  Reorders       │
+│  Drizzle ORM    │ │  Cache       │ │  AI drafting    │
+└─────────────────┘ └─────────────┘ │  Follow-ups      │
+                                    │  Webhook payloads│
+                                    └─────────────────┘
 
 External APIs:
-  Meta Graph API (IG DMs) ←→ SWIPE Webhook Receiver
-  WhatsApp Business API   ←→ SWIPE Webhook Receiver
-  Shopify Partner API     ←→ SWIPE Webhook Receiver
-  OpenAI GPT-4o           ←→ AI Worker
+  Meta Graph API (IG DMs) ←→ Next.js webhook route → Trigger.dev
+  WhatsApp Business API   ←→ Next.js webhook route → Trigger.dev
+  Shopify Partner API     ←→ Next.js webhook route → Trigger.dev
+  OpenAI GPT-4o           ←→ Trigger.dev task
 ```
 
 ---
@@ -60,11 +61,11 @@ External APIs:
 | Technology | Choice | Rationale |
 |------------|--------|-----------|
 | Runtime | Node.js 20 + TypeScript | Type safety, ecosystem fit |
-| API style | REST + WebSocket | REST for CRUD, WS for inbox real-time |
+| API style | Server Actions + REST | Server Actions for app logic; REST for webhooks, cron |
 | Database | PostgreSQL via Supabase | RLS for tenant isolation, managed |
-| Cache | Redis (Upstash) | Inbox queue, sessions, rate limits |
-| Job queue | BullMQ | Reorder timers, AI drafting queue, follow-up sequences |
-| Auth | Supabase Auth + JWT | Handles OAuth flows + session management |
+| Cache | Redis (Upstash) | Sessions, rate limits |
+| Background jobs | **Trigger.dev** | Event-driven: reorder timers, AI drafting, follow-up sequences, webhook processing. No separate worker container. |
+| Auth | Better Auth / Supabase Auth + JWT | Handles OAuth flows + session management |
 | File storage | Supabase Storage | Catalog images, product card generation |
 
 ### Multi-tenancy Model
@@ -103,23 +104,27 @@ All queries are automatically scoped to the authenticated brand's `tenant_id`. N
 
 ## Webhook Infrastructure
 
+All webhooks are Next.js API routes. They verify the request, enqueue work to **Trigger.dev**, and return 200 immediately (e.g. Meta requires &lt; 1s response). No heavy processing in the request; Trigger.dev runs the task asynchronously.
+
 ### Inbound webhooks
 
 ```typescript
 // Meta webhook receiver
-POST /webhooks/meta
+POST /api/webhooks/meta
   → Verify signature (X-Hub-Signature-256)
   → Parse event type (message, read, reaction)
-  → Enqueue to BullMQ: 'inbox-processor'
+  → await trigger.send("inbox.process", { payload })
   → Return 200 immediately (Meta requires < 1s response)
 
 // Shopify webhook receiver  
-POST /webhooks/shopify
+POST /api/webhooks/shopify
   → Verify HMAC signature
   → Parse topic (orders/paid, fulfillments/create, etc.)
-  → Enqueue to BullMQ: 'order-processor'
+  → await trigger.send("order.process", { payload })
   → Return 200 immediately
 ```
+
+Trigger.dev tasks (e.g. `inbox.process`, `order.process`) run in Trigger.dev's infrastructure; they call back into your DB, OpenAI, and Meta/Shopify APIs as needed.
 
 ### Outbound message queue
 
@@ -157,14 +162,15 @@ analytics_events  → event stream for dashboard (tenant_id FK)
 
 | Concern | Approach |
 |---------|----------|
-| Hosting | Vercel (frontend) + Railway or Fly.io (API + workers) |
+| Hosting | **Vercel only** — single Next.js app (frontend, API routes, Server Actions). No separate API or worker container. |
+| Background jobs | **Trigger.dev** — event-driven tasks (reorders, AI drafting, webhook processing). Tasks run on Trigger.dev; no BullMQ or long-running process to host. |
 | Database | Supabase managed PostgreSQL |
-| Redis | Upstash serverless Redis |
+| Redis | Upstash serverless Redis (rate limits, cache) |
 | CDN | Cloudflare (catalog pages, product card images) |
 | Monitoring | Sentry (errors) + Grafana/Loki (logs) |
 | Analytics | PostHog (product analytics, via Cloudflare Worker proxy) |
-| CI/CD | GitHub Actions → Vercel + Railway deploy |
-| Secrets | Doppler or Vercel env vars |
+| CI/CD | GitHub Actions → Vercel deploy (single pipeline) |
+| Secrets | Doppler or Vercel env vars (Trigger.dev has its own dashboard for task env) |
 
 ---
 

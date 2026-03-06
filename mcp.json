@@ -3,6 +3,10 @@
     "next-devtools": {
       "command": "npx",
       "args": ["-y", "next-devtools-mcp@latest"]
+    },
+    "trigger": {
+      "args": ["trigger.dev@4.4.2", "mcp"],
+      "command": "npx"
     }
   }
 }

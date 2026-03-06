@@ -29,7 +29,7 @@
 
 ## Quick Reference
 
-**Stack:** Next.js 15 · PostgreSQL/Supabase · Redis · BullMQ · OpenAI GPT-4o · Meta Graph API · WhatsApp Business API · Shopify
+**Stack:** Next.js 15 · PostgreSQL/Supabase · Redis · Trigger.dev (event-driven jobs) · OpenAI GPT-4o · Meta Graph API · WhatsApp Business API · Shopify
 
 **Pricing tiers:** Starter ($79/mo) · Growth ($199/mo) · Scale ($499/mo) · Agency ($299/mo per brand)
 

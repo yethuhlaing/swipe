@@ -1,5 +1,9 @@
 import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core"
 
+// ============================================================================
+// Better Auth Tables (required for authentication)
+// ============================================================================
+
 // Better Auth User Table
 export const user = pgTable("user", {
     id: text("id").primaryKey(),
@@ -66,3 +70,8 @@ export type NewAccount = typeof account.$inferInsert
 
 export type Verification = typeof verification.$inferSelect
 export type NewVerification = typeof verification.$inferInsert
+
+// ============================================================================
+// SWIPE Business Schema
+// ============================================================================
+export * from "./schema/index"

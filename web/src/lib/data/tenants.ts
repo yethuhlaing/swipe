@@ -1,0 +1,180 @@
+import { db } from "@/db"
+import {
+    tenants,
+    tenantMembers,
+    pipelineStages,
+    priceTiers,
+    templates,
+    DEFAULT_PIPELINE_STAGES,
+    DEFAULT_PRICE_TIERS,
+    DEFAULT_TEMPLATES,
+    type Tenant,
+    type NewTenant,
+} from "@/db/schema"
+import { eq, and } from "drizzle-orm"
+
+/**
+ * Tenant Data Access Layer
+ *
+ * All tenant-related database operations.
+ * Use these functions instead of direct db queries for consistency.
+ */
+
+// ============================================================================
+// Queries
+// ============================================================================
+
+export async function getTenantById(id: string): Promise<Tenant | null> {
+    const [tenant] = await db.select().from(tenants).where(eq(tenants.id, id)).limit(1)
+    return tenant ?? null
+}
+
+export async function getTenantBySlug(slug: string): Promise<Tenant | null> {
+    const [tenant] = await db.select().from(tenants).where(eq(tenants.slug, slug)).limit(1)
+    return tenant ?? null
+}
+
+export async function getTenantByOwnerId(ownerId: string): Promise<Tenant | null> {
+    const [tenant] = await db
+        .select()
+        .from(tenants)
+        .where(eq(tenants.ownerId, ownerId))
+        .limit(1)
+    return tenant ?? null
+}
+
+export async function getTenantsByUserId(userId: string): Promise<Tenant[]> {
+    const memberships = await db
+        .select({ tenant: tenants })
+        .from(tenantMembers)
+        .innerJoin(tenants, eq(tenants.id, tenantMembers.tenantId))
+        .where(eq(tenantMembers.userId, userId))
+
+    return memberships.map((m) => m.tenant)
+}
+
+// ============================================================================
+// Mutations
+// ============================================================================
+
+export async function createTenant(data: {
+    name: string
+    ownerId: string
+    slug?: string
+}): Promise<Tenant> {
+    // Generate slug from name if not provided
+    const slug = data.slug ?? generateSlug(data.name)
+
+    // Create tenant
+    const [tenant] = await db
+        .insert(tenants)
+        .values({
+            name: data.name,
+            ownerId: data.ownerId,
+            slug,
+        })
+        .returning()
+
+    // Add owner as member
+    await db.insert(tenantMembers).values({
+        tenantId: tenant.id,
+        userId: data.ownerId,
+        role: "owner",
+    })
+
+    // Initialize default pipeline stages
+    await initializeDefaultPipelineStages(tenant.id)
+
+    // Initialize default price tiers
+    await initializeDefaultPriceTiers(tenant.id)
+
+    // Initialize default templates
+    await initializeDefaultTemplates(tenant.id)
+
+    return tenant
+}
+
+export async function updateTenant(
+    id: string,
+    data: Partial<Omit<NewTenant, "id" | "createdAt">>
+): Promise<Tenant | null> {
+    const [updated] = await db
+        .update(tenants)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(tenants.id, id))
+        .returning()
+
+    return updated ?? null
+}
+
+export async function connectInstagram(
+    tenantId: string,
+    data: {
+        instagramBusinessId: string
+        instagramAccessToken: string
+        expiresAt?: Date
+    }
+): Promise<Tenant | null> {
+    return updateTenant(tenantId, {
+        instagramBusinessId: data.instagramBusinessId,
+        instagramAccessToken: data.instagramAccessToken,
+        instagramTokenExpiresAt: data.expiresAt,
+        instagramConnectedAt: new Date(),
+    })
+}
+
+export async function connectShopify(
+    tenantId: string,
+    data: {
+        shopifyShop: string
+        shopifyAccessToken: string
+    }
+): Promise<Tenant | null> {
+    return updateTenant(tenantId, {
+        shopifyShop: data.shopifyShop,
+        shopifyAccessToken: data.shopifyAccessToken,
+        shopifyConnectedAt: new Date(),
+    })
+}
+
+// ============================================================================
+// Helpers
+// ============================================================================
+
+function generateSlug(name: string): string {
+    return name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 50)
+}
+
+async function initializeDefaultPipelineStages(tenantId: string) {
+    const stagesToInsert = DEFAULT_PIPELINE_STAGES.map((stage) => ({
+        tenantId,
+        ...stage,
+        isDefault: true,
+    }))
+
+    await db.insert(pipelineStages).values(stagesToInsert)
+}
+
+async function initializeDefaultPriceTiers(tenantId: string) {
+    const tiersToInsert = DEFAULT_PRICE_TIERS.map((tier) => ({
+        tenantId,
+        ...tier,
+    }))
+
+    await db.insert(priceTiers).values(tiersToInsert)
+}
+
+async function initializeDefaultTemplates(tenantId: string) {
+    const templatesToInsert = DEFAULT_TEMPLATES.map((template) => ({
+        tenantId,
+        ...template,
+        variables: [...template.variables],
+        isDefault: true,
+    }))
+
+    await db.insert(templates).values(templatesToInsert)
+}

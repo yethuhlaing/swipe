@@ -23,6 +23,15 @@ export const env = createEnv({
         UPSTASH_REDIS_REST_URL: z.string().url(),
         UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
         NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+
+        // SWIPE - Wholesale Sales OS
+        OPENAI_API_KEY: z.string().optional(),
+        TRIGGER_SECRET_KEY: z.string().optional(),
+        META_APP_SECRET: z.string().optional(),
+        META_WEBHOOK_VERIFY_TOKEN: z.string().optional(),
+        SHOPIFY_CLIENT_ID: z.string().optional(),
+        SHOPIFY_CLIENT_SECRET: z.string().optional(),
+        CRON_SECRET: z.string().optional(),
     },
 
     /**
@@ -51,6 +60,15 @@ export const env = createEnv({
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
         NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
         NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+
+        // SWIPE - Wholesale Sales OS
+        OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+        TRIGGER_SECRET_KEY: process.env.TRIGGER_SECRET_KEY,
+        META_APP_SECRET: process.env.META_APP_SECRET,
+        META_WEBHOOK_VERIFY_TOKEN: process.env.META_WEBHOOK_VERIFY_TOKEN,
+        SHOPIFY_CLIENT_ID: process.env.SHOPIFY_CLIENT_ID,
+        SHOPIFY_CLIENT_SECRET: process.env.SHOPIFY_CLIENT_SECRET,
+        CRON_SECRET: process.env.CRON_SECRET,
     },
 
     /**
