@@ -3,7 +3,7 @@ import "./globals.css"
 
 import { ThemeProvider } from "@/providers/theme-provider"
 import { SidebarConfigProvider } from "@/contexts/sidebar-context"
-import { inter } from "@/lib/fonts"
+import { inter } from "@/config/fonts"
 import { Toaster } from "@/components/ui/sonner"
 
 export const metadata: Metadata = {

@@ -3,9 +3,19 @@
 import { Pie, PieChart } from "recharts"
 import { TrendingDown, TrendingUp } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import type { AiDraftMetrics } from "@/lib/dto"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import {
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
+} from "@/components/ui/chart"
+import type { AiDraftMetrics } from "@/dto/analytics"
 
 type AiPerformanceProps = {
     metrics: AiDraftMetrics
@@ -24,9 +34,21 @@ function formatSignedPercent(value: number): string {
 
 export function AiPerformance({ metrics }: AiPerformanceProps) {
     const chartData = [
-        { key: "approved", value: metrics.approvedCount, fill: "var(--color-approved)" },
-        { key: "edited", value: metrics.editedCount, fill: "var(--color-edited)" },
-        { key: "rejected", value: metrics.rejectedCount, fill: "var(--color-rejected)" },
+        {
+            key: "approved",
+            value: metrics.approvedCount,
+            fill: "var(--color-approved)",
+        },
+        {
+            key: "edited",
+            value: metrics.editedCount,
+            fill: "var(--color-edited)",
+        },
+        {
+            key: "rejected",
+            value: metrics.rejectedCount,
+            fill: "var(--color-rejected)",
+        },
     ]
     const trendUp = metrics.approvalRateChangePct >= 0
     const TrendIcon = trendUp ? TrendingUp : TrendingDown
@@ -41,10 +63,15 @@ export function AiPerformance({ metrics }: AiPerformanceProps) {
                         {formatSignedPercent(metrics.approvalRateChangePct)}
                     </Badge>
                 </div>
-                <CardDescription>Draft outcomes and approval quality</CardDescription>
+                <CardDescription>
+                    Draft outcomes and approval quality
+                </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <ChartContainer config={chartConfig} className="h-[180px] w-full">
+                <ChartContainer
+                    config={chartConfig}
+                    className="h-[180px] w-full"
+                >
                     <PieChart>
                         <Pie
                             data={chartData}
@@ -72,24 +99,32 @@ export function AiPerformance({ metrics }: AiPerformanceProps) {
 
                 <div className="grid grid-cols-2 gap-2 text-sm">
                     <div className="rounded-md border p-3">
-                        <div className="text-muted-foreground">Approval Rate</div>
+                        <div className="text-muted-foreground">
+                            Approval Rate
+                        </div>
                         <div className="text-xl font-semibold">
                             {metrics.approvalRate.toFixed(1)}%
                         </div>
                     </div>
                     <div className="rounded-md border p-3">
-                        <div className="text-muted-foreground">Total Drafts</div>
+                        <div className="text-muted-foreground">
+                            Total Drafts
+                        </div>
                         <div className="text-xl font-semibold">
                             {metrics.totalDrafts.toLocaleString()}
                         </div>
                     </div>
                     <div className="rounded-md border p-3">
                         <div className="text-muted-foreground">Approved</div>
-                        <div className="font-semibold">{metrics.approvedCount}</div>
+                        <div className="font-semibold">
+                            {metrics.approvedCount}
+                        </div>
                     </div>
                     <div className="rounded-md border p-3">
                         <div className="text-muted-foreground">Rejected</div>
-                        <div className="font-semibold">{metrics.rejectedCount}</div>
+                        <div className="font-semibold">
+                            {metrics.rejectedCount}
+                        </div>
                     </div>
                 </div>
             </CardContent>

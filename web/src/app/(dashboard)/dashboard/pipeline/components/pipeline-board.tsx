@@ -12,7 +12,7 @@ import {
 import { PipelineColumn } from "./pipeline-column"
 import { moveBuyerToStageAction } from "@/actions/buyer"
 import { toast } from "sonner"
-import type { BuyerWithStage } from "@/lib/dto"
+import type { BuyerWithStage } from "@/dto/buyer"
 import type { PipelineStage } from "@/db/schema"
 
 interface PipelineBoardProps {
@@ -67,8 +67,11 @@ export function PipelineBoard({
                         stage={stage}
                         buyers={
                             stage.position === 1 && unassignedBuyers.length > 0
-                                ? [...unassignedBuyers, ...(buyersByStageId[stage.id] ?? [])]
-                                : buyersByStageId[stage.id] ?? []
+                                ? [
+                                      ...unassignedBuyers,
+                                      ...(buyersByStageId[stage.id] ?? []),
+                                  ]
+                                : (buyersByStageId[stage.id] ?? [])
                         }
                     />
                 ))}

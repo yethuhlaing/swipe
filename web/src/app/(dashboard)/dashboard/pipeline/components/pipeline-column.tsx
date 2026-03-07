@@ -1,9 +1,9 @@
 "use client"
 
 import { useDroppable } from "@dnd-kit/core"
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 import { BuyerCard } from "./buyer-card"
-import type { BuyerWithStage } from "@/lib/dto"
+import type { BuyerWithStage } from "@/dto/buyer"
 import type { PipelineStage } from "@/db/schema"
 
 interface PipelineColumnProps {
@@ -12,11 +12,7 @@ interface PipelineColumnProps {
     isOver?: boolean
 }
 
-export function PipelineColumn({
-    stage,
-    buyers,
-    isOver,
-}: PipelineColumnProps) {
+export function PipelineColumn({ stage, buyers, isOver }: PipelineColumnProps) {
     const { setNodeRef, isOver: isOverDroppable } = useDroppable({
         id: stage.id,
         data: { type: "stage", stage },
@@ -40,7 +36,9 @@ export function PipelineColumn({
                     borderLeftWidth: "4px",
                 }}
             >
-                <h3 className="truncate font-semibold text-foreground">{stage.name}</h3>
+                <h3 className="truncate font-semibold text-foreground">
+                    {stage.name}
+                </h3>
                 <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                     {buyers.length}
                 </span>

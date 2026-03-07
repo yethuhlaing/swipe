@@ -4,7 +4,7 @@ import { useCallback } from "react"
 import { Download } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import type { BuyerWithStage } from "@/lib/dto"
+import type { BuyerWithStage } from "@/dto/buyer"
 
 interface CsvExportButtonProps {
     buyers: BuyerWithStage[]
@@ -23,7 +23,10 @@ function formatDate(date: Date | null | undefined): string {
     return new Date(date).toISOString()
 }
 
-export function CsvExportButton({ buyers, filename = "buyers-export.csv" }: CsvExportButtonProps) {
+export function CsvExportButton({
+    buyers,
+    filename = "buyers-export.csv",
+}: CsvExportButtonProps) {
     const exportCsv = useCallback(() => {
         const headers = [
             "Instagram username",
@@ -49,7 +52,9 @@ export function CsvExportButton({ buyers, filename = "buyers-export.csv" }: CsvE
                 : "",
             formatDate(b.createdAt),
         ])
-        const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n")
+        const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join(
+            "\n"
+        )
         const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
         const url = URL.createObjectURL(blob)
         const a = document.createElement("a")

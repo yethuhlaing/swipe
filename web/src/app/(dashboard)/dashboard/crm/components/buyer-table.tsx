@@ -29,7 +29,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Settings2 } from "lucide-react"
-import type { BuyerWithStage } from "@/lib/dto"
+import type { BuyerWithStage } from "@/dto/buyer"
 import type { PipelineStage } from "@/db/schema"
 import { getBuyerTableColumns } from "./buyer-table-columns"
 import { BuyerFilters } from "./buyer-filters"
@@ -61,7 +61,8 @@ export function BuyerTable({
 }: BuyerTableProps) {
     const router = useRouter()
     const pathname = usePathname()
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
+    const [columnVisibility, setColumnVisibility] =
+        React.useState<VisibilityState>({})
 
     const columns = React.useMemo(() => getBuyerTableColumns(), [])
 
@@ -129,7 +130,9 @@ export function BuyerTable({
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-[150px]">
-                            <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+                            <DropdownMenuLabel>
+                                Toggle columns
+                            </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             {table
                                 .getAllColumns()
@@ -166,7 +169,8 @@ export function BuyerTable({
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                  header.column.columnDef.header,
+                                                  header.column.columnDef
+                                                      .header,
                                                   header.getContext()
                                               )}
                                     </TableHead>
@@ -194,7 +198,8 @@ export function BuyerTable({
                                     colSpan={columns.length}
                                     className="h-24 text-center text-muted-foreground"
                                 >
-                                    No buyers found. Try adjusting search or filters.
+                                    No buyers found. Try adjusting search or
+                                    filters.
                                 </TableCell>
                             </TableRow>
                         )}

@@ -24,7 +24,7 @@ import {
 } from "lucide-react"
 
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 
 const Command = React.forwardRef<
     React.ElementRef<typeof CommandPrimitive>,
@@ -147,7 +147,12 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
         // Apps
         { title: "Mail", url: "/mail", group: "Apps", icon: Mail },
         { title: "Tasks", url: "/tasks", group: "Apps", icon: CheckSquare },
-        { title: "Chat", url: "/dashboard/chat", group: "Apps", icon: MessageCircle },
+        {
+            title: "Chat",
+            url: "/dashboard/chat",
+            group: "Apps",
+            icon: MessageCircle,
+        },
         { title: "Calendar", url: "/calendar", group: "Apps", icon: Calendar },
 
         // Auth Pages

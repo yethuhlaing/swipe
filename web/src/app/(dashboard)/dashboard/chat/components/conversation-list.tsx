@@ -13,7 +13,7 @@ import {
     Filter,
 } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -216,7 +216,8 @@ export function ConversationList({
                                     </p>
 
                                     {/* Pending draft badge (inbox) */}
-                                    {(conversation.pendingDraftCount ?? 0) > 0 && (
+                                    {(conversation.pendingDraftCount ?? 0) >
+                                        0 && (
                                         <span className="shrink-0 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-medium px-1.5 py-0.5">
                                             Draft
                                         </span>

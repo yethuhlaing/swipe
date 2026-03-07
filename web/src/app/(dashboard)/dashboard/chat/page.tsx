@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { getCurrentTenant } from "@/lib/session"
-import { getConversationByBuyerId } from "@/lib/data/conversations"
+import { getConversationByBuyerId } from "@/data/conversations"
 import {
     getRecentConversationsAction,
     getPendingDraftsAction,
@@ -42,7 +42,8 @@ function mapApiConversationToChat(
         isPinned: false,
         isMuted: false,
         buyerId: b.id,
-        pendingDraftCount: pendingDraftCount > 0 ? pendingDraftCount : undefined,
+        pendingDraftCount:
+            pendingDraftCount > 0 ? pendingDraftCount : undefined,
     }
 }
 
@@ -58,8 +59,7 @@ function mapApiMessageToChat(
             typeof msg.createdAt === "string"
                 ? msg.createdAt
                 : (msg.createdAt as Date).toISOString(),
-        senderId:
-            msg.direction === "outbound" ? "current-user" : msg.buyerId,
+        senderId: msg.direction === "outbound" ? "current-user" : msg.buyerId,
         type: "text",
         isEdited: false,
         reactions: [],
@@ -110,19 +110,21 @@ export default async function ChatPage({ searchParams }: ChatPageProps) {
         conversationId = conv?.id ?? null
     }
 
-    const [conversationsResult, draftsResult, threadResult] = await Promise.all([
-        getRecentConversationsAction(tenant.id),
-        getPendingDraftsAction(tenant.id),
-        conversationId
-            ? getConversationWithMessagesAction(tenant.id, conversationId)
-            : Promise.resolve({
-                  success: true as const,
-                  conversation: null,
-                  messages: [] as Awaited<
-                      ReturnType<typeof getConversationWithMessagesAction>
-                  >["messages"],
-              }),
-    ])
+    const [conversationsResult, draftsResult, threadResult] = await Promise.all(
+        [
+            getRecentConversationsAction(tenant.id),
+            getPendingDraftsAction(tenant.id),
+            conversationId
+                ? getConversationWithMessagesAction(tenant.id, conversationId)
+                : Promise.resolve({
+                      success: true as const,
+                      conversation: null,
+                      messages: [] as Awaited<
+                          ReturnType<typeof getConversationWithMessagesAction>
+                      >["messages"],
+                  }),
+        ]
+    )
 
     let apiConversations = conversationsResult.success
         ? conversationsResult.conversations
@@ -145,17 +147,14 @@ export default async function ChatPage({ searchParams }: ChatPageProps) {
     )
 
     const conversations: Conversation[] = apiConversations.map((c) =>
-        mapApiConversationToChat(
-            c,
-            draftCountByConversationId[c.id] ?? 0
-        )
+        mapApiConversationToChat(c, draftCountByConversationId[c.id] ?? 0)
     )
     const users: User[] = mapBuyersToUsers(apiConversations)
 
     let messages: Record<string, Message[]> = {}
-    let pendingDraft: Awaited<
-        ReturnType<typeof getPendingDraftsAction>
-    >["drafts"][number] | null = null
+    let pendingDraft:
+        | Awaited<ReturnType<typeof getPendingDraftsAction>>["drafts"][number]
+        | null = null
 
     if (
         threadResult.success &&
@@ -164,8 +163,7 @@ export default async function ChatPage({ searchParams }: ChatPageProps) {
     ) {
         const cid = threadResult.conversation.id
         messages[cid] = threadResult.messages.map(mapApiMessageToChat)
-        pendingDraft =
-            drafts.find((d) => d.conversationId === cid) ?? null
+        pendingDraft = drafts.find((d) => d.conversationId === cid) ?? null
     }
 
     return (

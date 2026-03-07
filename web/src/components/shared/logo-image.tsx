@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Logo } from "./logo"
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 
 interface LogoImageProps {
     /**
@@ -88,8 +88,7 @@ export function LogoImage({
                     "bg-primary text-primary-foreground flex items-center justify-center rounded-lg",
                 variant === "boxed" && !subtitle && "size-8 rounded-md",
                 variant === "boxed" && subtitle && "aspect-square size-8",
-                variant === "boxed-light" &&
-                    "p-2 bg-primary/10 rounded-lg"
+                variant === "boxed-light" && "p-2 bg-primary/10 rounded-lg"
             )}
         >
             <Logo
@@ -166,4 +165,3 @@ export function LogoImage({
         </Link>
     )
 }
-

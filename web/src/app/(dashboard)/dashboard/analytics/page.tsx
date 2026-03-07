@@ -8,7 +8,7 @@ import {
     getRevenueMetrics,
     getRevenueTrend,
     getTopLevelMetrics,
-} from "@/lib/data/analytics"
+} from "@/data/analytics"
 import { Skeleton } from "@/components/ui/skeleton"
 
 const MetricCards = dynamic(() =>
@@ -39,7 +39,9 @@ function ChartFallback() {
     return <Skeleton className="h-[360px] w-full rounded-xl" />
 }
 
-export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps) {
+export default async function AnalyticsPage({
+    searchParams,
+}: AnalyticsPageProps) {
     const tenant = await getCurrentTenant()
     if (!tenant) {
         redirect("/dashboard")
@@ -65,7 +67,8 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
             <div className="flex flex-col gap-2 shrink-0">
                 <h1 className="text-2xl font-bold tracking-tight">Analytics</h1>
                 <p className="text-muted-foreground">
-                    Track pipeline conversion, revenue performance, and AI draft quality.
+                    Track pipeline conversion, revenue performance, and AI draft
+                    quality.
                 </p>
             </div>
 
@@ -84,7 +87,10 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
                 <div className="xl:col-span-2">
                     <Suspense fallback={<ChartFallback />}>
-                        <RevenueChart data={revenueTrend} selectedDays={selectedDays} />
+                        <RevenueChart
+                            data={revenueTrend}
+                            selectedDays={selectedDays}
+                        />
                     </Suspense>
                 </div>
                 <div className="xl:col-span-1">

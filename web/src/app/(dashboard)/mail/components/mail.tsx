@@ -15,7 +15,7 @@ import {
     Users2,
 } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 import { Input } from "@/components/ui/input"
 import {
     ResizableHandle,

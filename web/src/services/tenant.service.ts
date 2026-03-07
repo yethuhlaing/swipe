@@ -3,7 +3,7 @@ import {
     insertTenant,
     addTenantMember,
     initializeDefaultsForTenant,
-} from "@/lib/data/tenants"
+} from "@/data/tenants"
 
 function generateSlug(name: string): string {
     return name

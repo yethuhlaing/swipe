@@ -1,9 +1,27 @@
 "use client"
 
-import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import type { FunnelStageDatum } from "@/lib/dto"
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Cell,
+    LabelList,
+    XAxis,
+    YAxis,
+} from "recharts"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import {
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
+} from "@/components/ui/chart"
+import type { FunnelStageDatum } from "@/dto/analytics"
 
 type FunnelChartProps = {
     data: FunnelStageDatum[]
@@ -24,14 +42,25 @@ export function FunnelChart({ data }: FunnelChartProps) {
                 <CardDescription>Buyer count by pipeline stage</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <ChartContainer config={chartConfig} className="h-[420px] w-full">
+                <ChartContainer
+                    config={chartConfig}
+                    className="h-[420px] w-full"
+                >
                     <BarChart
                         data={data}
                         layout="vertical"
                         margin={{ left: 8, right: 24, top: 4, bottom: 4 }}
                     >
-                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted/40" horizontal={false} />
-                        <XAxis type="number" axisLine={false} tickLine={false} />
+                        <CartesianGrid
+                            strokeDasharray="3 3"
+                            className="stroke-muted/40"
+                            horizontal={false}
+                        />
+                        <XAxis
+                            type="number"
+                            axisLine={false}
+                            tickLine={false}
+                        />
                         <YAxis
                             dataKey="stageName"
                             type="category"
@@ -59,8 +88,13 @@ export function FunnelChart({ data }: FunnelChartProps) {
 
                 <div className="grid grid-cols-1 gap-2 text-xs text-muted-foreground md:grid-cols-2 xl:grid-cols-3">
                     {data.map((stage) => (
-                        <div key={stage.stageId} className="rounded-md border px-3 py-2">
-                            <div className="font-medium text-foreground">{stage.stageName}</div>
+                        <div
+                            key={stage.stageId}
+                            className="rounded-md border px-3 py-2"
+                        >
+                            <div className="font-medium text-foreground">
+                                {stage.stageName}
+                            </div>
                             <div>{stage.count.toLocaleString()} buyers</div>
                             <div>
                                 Conversion from previous:{" "}

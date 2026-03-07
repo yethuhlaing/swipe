@@ -1,12 +1,12 @@
 import type { Buyer } from "@/db/schema"
-import type { BuyerListParams, BuyerWithStage } from "@/lib/dto"
+import type { BuyerListParams, BuyerWithStage } from "@/dto/buyer"
 import {
     getBuyerById,
     listBuyers,
     updateBuyer,
     closeBuyerStageHistory,
     insertBuyerStageHistory,
-} from "@/lib/data/buyers"
+} from "@/data/buyers"
 
 /** Business logic: move buyer to a new stage (close previous history, open new, update buyer). */
 export async function moveBuyerToStage(

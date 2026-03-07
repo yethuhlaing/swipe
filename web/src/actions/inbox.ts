@@ -6,8 +6,8 @@ import { revalidatePath } from "next/cache"
 import { db } from "@/db"
 import { aiDrafts, messages, conversations, buyers } from "@/db/schema"
 import { eq, and, desc } from "drizzle-orm"
-import { getTenantById } from "@/lib/data/tenants"
-import { moveBuyerToStage } from "@/lib/services"
+import { getTenantById } from "@/data/tenants"
+import { moveBuyerToStage } from "@/services/buyer.service"
 import { triggerTask } from "@/trigger/client"
 
 /**

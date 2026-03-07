@@ -3,8 +3,18 @@
 import { useMemo, useState } from "react"
 import { format } from "date-fns"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import {
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
+} from "@/components/ui/chart"
 import {
     Select,
     SelectContent,
@@ -12,7 +22,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import type { RevenueTrendDatum } from "@/lib/dto"
+import type { RevenueTrendDatum } from "@/dto/analytics"
 
 type RevenueChartProps = {
     data: RevenueTrendDatum[]
@@ -52,9 +62,14 @@ export function RevenueChart({ data, selectedDays }: RevenueChartProps) {
             <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
                 <div>
                     <CardTitle>Revenue Trend</CardTitle>
-                    <CardDescription>Daily GMV and order activity</CardDescription>
+                    <CardDescription>
+                        Daily GMV and order activity
+                    </CardDescription>
                 </div>
-                <Select value={String(range)} onValueChange={(v) => setRange(Number(v) as Range)}>
+                <Select
+                    value={String(range)}
+                    onValueChange={(v) => setRange(Number(v) as Range)}
+                >
                     <SelectTrigger className="w-28">
                         <SelectValue />
                     </SelectTrigger>
@@ -66,15 +81,38 @@ export function RevenueChart({ data, selectedDays }: RevenueChartProps) {
                 </Select>
             </CardHeader>
             <CardContent className="pt-4">
-                <ChartContainer config={chartConfig} className="h-[360px] w-full">
-                    <AreaChart data={chartData} margin={{ left: 12, right: 12, top: 8 }}>
+                <ChartContainer
+                    config={chartConfig}
+                    className="h-[360px] w-full"
+                >
+                    <AreaChart
+                        data={chartData}
+                        margin={{ left: 12, right: 12, top: 8 }}
+                    >
                         <defs>
-                            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="var(--color-revenue)" stopOpacity={0.4} />
-                                <stop offset="95%" stopColor="var(--color-revenue)" stopOpacity={0.05} />
+                            <linearGradient
+                                id="colorRevenue"
+                                x1="0"
+                                y1="0"
+                                x2="0"
+                                y2="1"
+                            >
+                                <stop
+                                    offset="5%"
+                                    stopColor="var(--color-revenue)"
+                                    stopOpacity={0.4}
+                                />
+                                <stop
+                                    offset="95%"
+                                    stopColor="var(--color-revenue)"
+                                    stopOpacity={0.05}
+                                />
                             </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
+                        <CartesianGrid
+                            strokeDasharray="3 3"
+                            className="stroke-muted/30"
+                        />
                         <XAxis
                             dataKey="label"
                             axisLine={false}
@@ -92,7 +130,9 @@ export function RevenueChart({ data, selectedDays }: RevenueChartProps) {
                         <ChartTooltip
                             content={
                                 <ChartTooltipContent
-                                    formatter={(value) => formatCurrency(Number(value))}
+                                    formatter={(value) =>
+                                        formatCurrency(Number(value))
+                                    }
                                     labelFormatter={(label) => `Date: ${label}`}
                                 />
                             }

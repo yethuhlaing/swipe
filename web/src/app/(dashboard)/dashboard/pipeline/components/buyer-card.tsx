@@ -7,7 +7,7 @@ import { formatDistanceToNow } from "date-fns"
 import { GripVertical } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { QuickActions } from "./quick-actions"
-import type { BuyerWithStage } from "@/lib/dto"
+import type { BuyerWithStage } from "@/dto/buyer"
 
 interface BuyerCardProps {
     buyer: BuyerWithStage
@@ -15,20 +15,18 @@ interface BuyerCardProps {
 
 function daysInStage(enteredAt: Date | null, createdAt: Date): number {
     const from = enteredAt ?? createdAt
-    return Math.max(0, Math.floor((Date.now() - from.getTime()) / (24 * 60 * 60 * 1000)))
+    return Math.max(
+        0,
+        Math.floor((Date.now() - from.getTime()) / (24 * 60 * 60 * 1000))
+    )
 }
 
 function BuyerCardInner({ buyer }: BuyerCardProps) {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        isDragging,
-    } = useDraggable({
-        id: buyer.id,
-        data: { type: "buyer", buyer },
-    })
+    const { attributes, listeners, setNodeRef, transform, isDragging } =
+        useDraggable({
+            id: buyer.id,
+            data: { type: "buyer", buyer },
+        })
 
     const style = transform
         ? {
@@ -37,7 +35,9 @@ function BuyerCardInner({ buyer }: BuyerCardProps) {
         : undefined
 
     const rawUsername = buyer.instagramUsername ?? buyer.instagramName
-    const username = rawUsername ? `@${String(rawUsername).replace(/^@/, "")}` : "—"
+    const username = rawUsername
+        ? `@${String(rawUsername).replace(/^@/, "")}`
+        : "—"
     const storeName = buyer.storeName ?? "—"
     const days = daysInStage(buyer.stageEnteredAt, buyer.createdAt)
     const lastActivity = buyer.lastActivityAt
@@ -88,12 +88,8 @@ function BuyerCardInner({ buyer }: BuyerCardProps) {
                 />
             </div>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                <span title="Days in current stage">
-                    {days}d in stage
-                </span>
-                <span title="Last activity">
-                    {lastActivity}
-                </span>
+                <span title="Days in current stage">{days}d in stage</span>
+                <span title="Last activity">{lastActivity}</span>
             </div>
         </div>
     )

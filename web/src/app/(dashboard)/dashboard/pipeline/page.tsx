@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation"
 import { getCurrentTenant } from "@/lib/session"
-import { listPipelineStages } from "@/lib/data/pipeline"
-import { listBuyers } from "@/lib/data/buyers"
+import { listPipelineStages } from "@/data/pipeline"
+import { listBuyers } from "@/data/buyers"
 import { PipelineBoard } from "./components/pipeline-board"
-import type { BuyerWithStage } from "@/lib/dto"
+import type { BuyerWithStage } from "@/dto/buyer"
 import type { PipelineStage } from "@/db/schema"
 
 export default async function PipelinePage() {

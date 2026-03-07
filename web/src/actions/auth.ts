@@ -5,7 +5,7 @@ import { user } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { emailVerificationRateLimit } from "@/lib/rate-limit"
 import { Resend } from "resend"
-import { env } from "@/env"
+import { env } from "@/config/env"
 import { VerificationEmail } from "../emails/verification-email"
 import { auth } from "@/lib/auth"
 

@@ -2,7 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MessageSquare, FileText, ShoppingBag, User } from "lucide-react"
-import type { BuyerWithStage } from "@/lib/dto"
+import type { BuyerWithStage } from "@/dto/buyer"
 import type { PipelineStage } from "@/db/schema"
 import type { Message } from "@/db/schema"
 import type { Order } from "@/db/schema"
@@ -57,7 +57,10 @@ export function BuyerDetailView({
                 </TabsTrigger>
             </TabsList>
             <div className="flex-1 min-h-0 pt-4 overflow-auto">
-                <TabsContent value="overview" className="mt-0 focus-visible:outline-none">
+                <TabsContent
+                    value="overview"
+                    className="mt-0 focus-visible:outline-none"
+                >
                     <BuyerDetail
                         buyer={buyer}
                         stages={stages}
@@ -71,13 +74,22 @@ export function BuyerDetailView({
                         />
                     </div>
                 </TabsContent>
-                <TabsContent value="messages" className="mt-0 focus-visible:outline-none">
+                <TabsContent
+                    value="messages"
+                    className="mt-0 focus-visible:outline-none"
+                >
                     <BuyerMessagesTab messages={messages} buyer={buyer} />
                 </TabsContent>
-                <TabsContent value="orders" className="mt-0 focus-visible:outline-none">
+                <TabsContent
+                    value="orders"
+                    className="mt-0 focus-visible:outline-none"
+                >
                     <BuyerOrdersTab orders={orders} />
                 </TabsContent>
-                <TabsContent value="notes" className="mt-0 focus-visible:outline-none">
+                <TabsContent
+                    value="notes"
+                    className="mt-0 focus-visible:outline-none"
+                >
                     <BuyerDetail
                         buyer={buyer}
                         stages={stages}

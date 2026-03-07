@@ -9,7 +9,7 @@ import type {
     RevenueTrendDatum,
     AiDraftMetrics,
     TopLevelMetrics,
-} from "@/lib/dto/analytics"
+} from "@/dto/analytics"
 
 export type {
     DateRangeInput,
@@ -20,7 +20,10 @@ export type {
     TopLevelMetrics,
 }
 
-function getPreviousRange({ startDate, endDate }: DateRangeInput): DateRangeInput {
+function getPreviousRange({
+    startDate,
+    endDate,
+}: DateRangeInput): DateRangeInput {
     const duration = Math.max(1, endDate.getTime() - startDate.getTime())
     return {
         startDate: new Date(startDate.getTime() - duration),
@@ -63,8 +66,7 @@ async function getRevenueSnapshot(
         .select({
             gmv: sql<string>`coalesce(sum(${orders.total}), 0)`,
             orderCount: sql<number>`count(*)`,
-            reorderCount:
-                sql<number>`sum(case when ${orders.isReorder} = true then 1 else 0 end)`,
+            reorderCount: sql<number>`sum(case when ${orders.isReorder} = true then 1 else 0 end)`,
         })
         .from(orders)
         .where(
@@ -103,12 +105,9 @@ async function getAiSnapshot(
     const [result] = await db
         .select({
             totalDrafts: sql<number>`count(*)`,
-            approvedCount:
-                sql<number>`sum(case when ${aiDrafts.status} = 'approved' then 1 else 0 end)`,
-            rejectedCount:
-                sql<number>`sum(case when ${aiDrafts.status} = 'rejected' then 1 else 0 end)`,
-            editedCount:
-                sql<number>`sum(case when ${aiDrafts.status} = 'edited' then 1 else 0 end)`,
+            approvedCount: sql<number>`sum(case when ${aiDrafts.status} = 'approved' then 1 else 0 end)`,
+            rejectedCount: sql<number>`sum(case when ${aiDrafts.status} = 'rejected' then 1 else 0 end)`,
+            editedCount: sql<number>`sum(case when ${aiDrafts.status} = 'edited' then 1 else 0 end)`,
         })
         .from(aiDrafts)
         .where(
@@ -135,63 +134,68 @@ async function getAiSnapshot(
     }
 }
 
-export const getPipelineFunnel = cache(async (tenantId: string): Promise<FunnelStageDatum[]> => {
-    const results = await db
-        .select({
-            stageId: pipelineStages.id,
-            stageName: pipelineStages.name,
-            slug: pipelineStages.slug,
-            color: pipelineStages.color,
-            position: pipelineStages.position,
-            count: sql<number>`coalesce(count(${buyers.id}), 0)`,
+export const getPipelineFunnel = cache(
+    async (tenantId: string): Promise<FunnelStageDatum[]> => {
+        const results = await db
+            .select({
+                stageId: pipelineStages.id,
+                stageName: pipelineStages.name,
+                slug: pipelineStages.slug,
+                color: pipelineStages.color,
+                position: pipelineStages.position,
+                count: sql<number>`coalesce(count(${buyers.id}), 0)`,
+            })
+            .from(pipelineStages)
+            .leftJoin(
+                buyers,
+                and(
+                    eq(buyers.tenantId, tenantId),
+                    eq(buyers.currentStageId, pipelineStages.id),
+                    eq(buyers.isDisqualified, false)
+                )
+            )
+            .where(
+                and(
+                    eq(pipelineStages.tenantId, tenantId),
+                    eq(pipelineStages.isActive, true)
+                )
+            )
+            .groupBy(
+                pipelineStages.id,
+                pipelineStages.name,
+                pipelineStages.slug,
+                pipelineStages.color,
+                pipelineStages.position
+            )
+            .orderBy(asc(pipelineStages.position))
+
+        let previousCount: number | null = null
+        return results.map((row) => {
+            const count = Number(row.count ?? 0)
+            const conversionFromPrev =
+                previousCount === null || previousCount === 0
+                    ? null
+                    : round2((count / previousCount) * 100)
+            previousCount = count
+
+            return {
+                stageId: row.stageId,
+                stageName: row.stageName,
+                slug: row.slug,
+                color: row.color ?? "#6366f1",
+                position: row.position,
+                count,
+                conversionFromPrev,
+            }
         })
-        .from(pipelineStages)
-        .leftJoin(
-            buyers,
-            and(
-                eq(buyers.tenantId, tenantId),
-                eq(buyers.currentStageId, pipelineStages.id),
-                eq(buyers.isDisqualified, false)
-            )
-        )
-        .where(
-            and(
-                eq(pipelineStages.tenantId, tenantId),
-                eq(pipelineStages.isActive, true)
-            )
-        )
-        .groupBy(
-            pipelineStages.id,
-            pipelineStages.name,
-            pipelineStages.slug,
-            pipelineStages.color,
-            pipelineStages.position
-        )
-        .orderBy(asc(pipelineStages.position))
-
-    let previousCount: number | null = null
-    return results.map((row) => {
-        const count = Number(row.count ?? 0)
-        const conversionFromPrev =
-            previousCount === null || previousCount === 0
-                ? null
-                : round2((count / previousCount) * 100)
-        previousCount = count
-
-        return {
-            stageId: row.stageId,
-            stageName: row.stageName,
-            slug: row.slug,
-            color: row.color ?? "#6366f1",
-            position: row.position,
-            count,
-            conversionFromPrev,
-        }
-    })
-})
+    }
+)
 
 export const getRevenueMetrics = cache(
-    async (tenantId: string, range: DateRangeInput): Promise<RevenueMetrics> => {
+    async (
+        tenantId: string,
+        range: DateRangeInput
+    ): Promise<RevenueMetrics> => {
         const previousRange = getPreviousRange(range)
         const [current, previous] = await Promise.all([
             getRevenueSnapshot(tenantId, range),
@@ -244,7 +248,10 @@ export const getRevenueTrend = cache(
             .groupBy(dayExpr)
             .orderBy(asc(dayExpr))
 
-        const byDate = new Map<string, { revenue: number; orderCount: number }>()
+        const byDate = new Map<
+            string,
+            { revenue: number; orderCount: number }
+        >()
         for (const row of rows) {
             const key = new Date(row.day).toISOString().slice(0, 10)
             byDate.set(key, {
@@ -271,7 +278,10 @@ export const getRevenueTrend = cache(
 )
 
 export const getAiDraftMetrics = cache(
-    async (tenantId: string, range: DateRangeInput): Promise<AiDraftMetrics> => {
+    async (
+        tenantId: string,
+        range: DateRangeInput
+    ): Promise<AiDraftMetrics> => {
         const previousRange = getPreviousRange(range)
         const [current, previous] = await Promise.all([
             getAiSnapshot(tenantId, range),
@@ -293,42 +303,51 @@ export const getAiDraftMetrics = cache(
 )
 
 export const getTopLevelMetrics = cache(
-    async (tenantId: string, range: DateRangeInput): Promise<TopLevelMetrics> => {
+    async (
+        tenantId: string,
+        range: DateRangeInput
+    ): Promise<TopLevelMetrics> => {
         const previousRange = getPreviousRange(range)
 
-        const [revenueCurrent, revenuePrevious, aiCurrent, aiPrevious, buyerCurrent, buyerPrevious] =
-            await Promise.all([
-                getRevenueSnapshot(tenantId, range),
-                getRevenueSnapshot(tenantId, previousRange),
-                getAiSnapshot(tenantId, range),
-                getAiSnapshot(tenantId, previousRange),
-                db
-                    .select({
-                        count: sql<number>`count(*)`,
-                    })
-                    .from(buyers)
-                    .where(
-                        and(
-                            eq(buyers.tenantId, tenantId),
-                            eq(buyers.isDisqualified, false),
-                            gte(buyers.lastActivityAt, range.startDate),
-                            lt(buyers.lastActivityAt, range.endDate)
-                        )
-                    ),
-                db
-                    .select({
-                        count: sql<number>`count(*)`,
-                    })
-                    .from(buyers)
-                    .where(
-                        and(
-                            eq(buyers.tenantId, tenantId),
-                            eq(buyers.isDisqualified, false),
-                            gte(buyers.lastActivityAt, previousRange.startDate),
-                            lt(buyers.lastActivityAt, previousRange.endDate)
-                        )
-                    ),
-            ])
+        const [
+            revenueCurrent,
+            revenuePrevious,
+            aiCurrent,
+            aiPrevious,
+            buyerCurrent,
+            buyerPrevious,
+        ] = await Promise.all([
+            getRevenueSnapshot(tenantId, range),
+            getRevenueSnapshot(tenantId, previousRange),
+            getAiSnapshot(tenantId, range),
+            getAiSnapshot(tenantId, previousRange),
+            db
+                .select({
+                    count: sql<number>`count(*)`,
+                })
+                .from(buyers)
+                .where(
+                    and(
+                        eq(buyers.tenantId, tenantId),
+                        eq(buyers.isDisqualified, false),
+                        gte(buyers.lastActivityAt, range.startDate),
+                        lt(buyers.lastActivityAt, range.endDate)
+                    )
+                ),
+            db
+                .select({
+                    count: sql<number>`count(*)`,
+                })
+                .from(buyers)
+                .where(
+                    and(
+                        eq(buyers.tenantId, tenantId),
+                        eq(buyers.isDisqualified, false),
+                        gte(buyers.lastActivityAt, previousRange.startDate),
+                        lt(buyers.lastActivityAt, previousRange.endDate)
+                    )
+                ),
+        ])
 
         const currentActiveBuyers = Number(buyerCurrent[0]?.count ?? 0)
         const previousActiveBuyers = Number(buyerPrevious[0]?.count ?? 0)
@@ -336,7 +355,10 @@ export const getTopLevelMetrics = cache(
         return {
             gmv: {
                 value: round2(revenueCurrent.gmv),
-                changePct: percentChange(revenueCurrent.gmv, revenuePrevious.gmv),
+                changePct: percentChange(
+                    revenueCurrent.gmv,
+                    revenuePrevious.gmv
+                ),
             },
             orders: {
                 value: revenueCurrent.orderCount,

@@ -1,6 +1,13 @@
 "use client"
 
-import { BarChart3, DollarSign, ShoppingCart, TrendingDown, TrendingUp, Users } from "lucide-react"
+import {
+    BarChart3,
+    DollarSign,
+    ShoppingCart,
+    TrendingDown,
+    TrendingUp,
+    Users,
+} from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import {
     Card,
@@ -10,7 +17,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import type { RevenueMetrics, TopLevelMetrics } from "@/lib/dto"
+import type { RevenueMetrics, TopLevelMetrics } from "@/dto/analytics"
 
 type MetricCardsProps = {
     metrics: TopLevelMetrics
@@ -35,7 +42,11 @@ function formatSignedPercent(value: number): string {
     return `${sign}${value.toFixed(1)}%`
 }
 
-export function MetricCards({ metrics, revenueMetrics, selectedDays }: MetricCardsProps) {
+export function MetricCards({
+    metrics,
+    revenueMetrics,
+    selectedDays,
+}: MetricCardsProps) {
     const data = [
         {
             title: "Total GMV",
@@ -91,7 +102,9 @@ export function MetricCards({ metrics, revenueMetrics, selectedDays }: MetricCar
                                 <metric.icon className="size-4" />
                                 Last {selectedDays} days
                             </div>
-                            <div className="text-muted-foreground">{metric.footer}</div>
+                            <div className="text-muted-foreground">
+                                {metric.footer}
+                            </div>
                         </CardFooter>
                     </Card>
                 )

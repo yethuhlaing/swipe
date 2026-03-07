@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { getCurrentTenant } from "@/lib/session"
-import { listPipelineStages } from "@/lib/data/pipeline"
+import { listPipelineStages } from "@/data/pipeline"
 import { PipelineStageSettingsForm } from "./components/pipeline-stage-settings-form"
 
 export default async function PipelineSettingsPage() {
@@ -16,7 +16,8 @@ export default async function PipelineSettingsPage() {
             <div>
                 <h1 className="text-3xl font-bold">Pipeline Configuration</h1>
                 <p className="text-muted-foreground">
-                    Configure stage names, colors, and AI confidence thresholds for your funnel.
+                    Configure stage names, colors, and AI confidence thresholds
+                    for your funnel.
                 </p>
             </div>
             <PipelineStageSettingsForm tenantId={tenant.id} stages={stages} />

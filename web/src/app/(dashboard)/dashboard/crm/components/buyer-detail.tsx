@@ -9,10 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 import { updateBuyerAction } from "@/actions/buyer"
 import { moveBuyerToStageAction } from "@/actions/buyer"
-import type { BuyerWithStage } from "@/lib/dto"
+import type { BuyerWithStage } from "@/dto/buyer"
 import type { PipelineStage } from "@/db/schema"
 import { formatDistanceToNow } from "date-fns"
 import { MessageSquare } from "lucide-react"
@@ -47,7 +47,7 @@ export function BuyerDetail({
     const [updateState, updateFormAction] = useActionState(
         async (_: unknown, formData: FormData) => {
             const result = await updateBuyerAction(tenantId, buyer.id, formData)
-            return result.success ? null : result.error ?? "Update failed"
+            return result.success ? null : (result.error ?? "Update failed")
         },
         null as string | null
     )
@@ -56,15 +56,26 @@ export function BuyerDetail({
         async (_: unknown, formData: FormData) => {
             const stageId = formData.get("stageId") as string
             if (!stageId) return null
-            const result = await moveBuyerToStageAction(tenantId, buyer.id, stageId)
-            return result.success ? null : result.error ?? "Failed to update stage"
+            const result = await moveBuyerToStageAction(
+                tenantId,
+                buyer.id,
+                stageId
+            )
+            return result.success
+                ? null
+                : (result.error ?? "Failed to update stage")
         },
         null as string | null
     )
 
     const displayName =
-        buyer.storeName ?? buyer.instagramName ?? buyer.instagramUsername ?? "Unknown"
-    const initials = (buyer.instagramUsername ?? displayName).slice(0, 2).toUpperCase()
+        buyer.storeName ??
+        buyer.instagramName ??
+        buyer.instagramUsername ??
+        "Unknown"
+    const initials = (buyer.instagramUsername ?? displayName)
+        .slice(0, 2)
+        .toUpperCase()
 
     if (notesOnly) {
         return (
@@ -89,7 +100,9 @@ export function BuyerDetail({
                             />
                         </div>
                         {updateState && (
-                            <p className="text-sm text-destructive">{updateState}</p>
+                            <p className="text-sm text-destructive">
+                                {updateState}
+                            </p>
                         )}
                         <Button type="submit">Save notes</Button>
                     </form>
@@ -119,26 +132,41 @@ export function BuyerDetail({
                                     : displayName}
                             </CardTitle>
                             {buyer.stage && (
-                                <Badge variant="secondary">{buyer.stage.name}</Badge>
+                                <Badge variant="secondary">
+                                    {buyer.stage.name}
+                                </Badge>
                             )}
                             {buyer.buyerScore != null && (
-                                <Badge variant="outline">{buyer.buyerScore}/10</Badge>
+                                <Badge variant="outline">
+                                    {buyer.buyerScore}/10
+                                </Badge>
                             )}
                         </div>
                         {buyer.storeName && (
-                            <p className="text-muted-foreground">{buyer.storeName}</p>
+                            <p className="text-muted-foreground">
+                                {buyer.storeName}
+                            </p>
                         )}
                         <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
                             {buyer.lastActivityAt && (
                                 <span>
                                     Last activity{" "}
-                                    {formatDistanceToNow(new Date(buyer.lastActivityAt), {
-                                        addSuffix: true,
-                                    })}
+                                    {formatDistanceToNow(
+                                        new Date(buyer.lastActivityAt),
+                                        {
+                                            addSuffix: true,
+                                        }
+                                    )}
                                 </span>
                             )}
-                            <Button variant="link" className="h-auto p-0 text-sm" asChild>
-                                <Link href={`/dashboard/chat?buyer=${buyer.id}`}>
+                            <Button
+                                variant="link"
+                                className="h-auto p-0 text-sm"
+                                asChild
+                            >
+                                <Link
+                                    href={`/dashboard/chat?buyer=${buyer.id}`}
+                                >
                                     <MessageSquare className="h-4 w-4 mr-1 inline" />
                                     Open thread
                                 </Link>
@@ -152,7 +180,8 @@ export function BuyerDetail({
                 <CardHeader>
                     <CardTitle>Profile</CardTitle>
                     <p className="text-sm text-muted-foreground">
-                        Edit buyer details. Changes are saved when you click Save.
+                        Edit buyer details. Changes are saved when you click
+                        Save.
                     </p>
                 </CardHeader>
                 <CardContent>
@@ -243,7 +272,9 @@ export function BuyerDetail({
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="reorderDays">Reorder days</Label>
+                                <Label htmlFor="reorderDays">
+                                    Reorder days
+                                </Label>
                                 <Input
                                     id="reorderDays"
                                     name="reorderDays"
@@ -266,7 +297,9 @@ export function BuyerDetail({
                             />
                         </div>
                         {updateState && (
-                            <p className="text-sm text-destructive">{updateState}</p>
+                            <p className="text-sm text-destructive">
+                                {updateState}
+                            </p>
                         )}
                         <Button type="submit">Save profile</Button>
                     </form>
@@ -282,7 +315,10 @@ export function BuyerDetail({
                         </p>
                     </CardHeader>
                     <CardContent>
-                        <form action={stageFormAction} className="flex flex-wrap items-end gap-2">
+                        <form
+                            action={stageFormAction}
+                            className="flex flex-wrap items-end gap-2"
+                        >
                             <div className="space-y-2 min-w-[180px]">
                                 <Label htmlFor="stageId">Stage</Label>
                                 <select

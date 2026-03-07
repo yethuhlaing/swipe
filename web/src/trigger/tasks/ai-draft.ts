@@ -4,7 +4,11 @@ import { aiDrafts, messages, buyers, pipelineStages } from "@/db/schema"
 import { eq, and, desc } from "drizzle-orm"
 import type { AiDraftPayload, ClassifyIntentPayload } from "../client"
 import { triggerTask } from "../client"
-import { classifyIntent, generateDraftReply, type IntentClassification } from "@/lib/ai/intent"
+import {
+    classifyIntent,
+    generateDraftReply,
+    type IntentClassification,
+} from "@/services/intent.service"
 
 /**
  * AI Draft Task
@@ -44,12 +48,13 @@ export const aiDraft = task({
             .orderBy(desc(messages.createdAt))
             .limit(10)
 
-        const conversationHistory = recentMessages
-            .reverse()
-            .map((m) => ({
-                role: m.direction === "inbound" ? ("buyer" as const) : ("brand" as const),
-                content: m.content,
-            }))
+        const conversationHistory = recentMessages.reverse().map((m) => ({
+            role:
+                m.direction === "inbound"
+                    ? ("buyer" as const)
+                    : ("brand" as const),
+            content: m.content,
+        }))
 
         // 2. Classify intent
         const intentResult = await classifyIntent({
@@ -110,7 +115,9 @@ export const aiDraft = task({
                 suggestedStageId,
                 model: "gpt-4o",
                 promptTokens: String(draftContent.usage?.promptTokens ?? 0),
-                completionTokens: String(draftContent.usage?.completionTokens ?? 0),
+                completionTokens: String(
+                    draftContent.usage?.completionTokens ?? 0
+                ),
                 confidence: String(intentResult.confidence),
                 status: "pending",
                 triggerMessageId,
@@ -154,7 +161,9 @@ export const classifyIntentTask = task({
         minTimeoutInMs: 1000,
         maxTimeoutInMs: 10000,
     },
-    run: async (payload: ClassifyIntentPayload): Promise<IntentClassification> => {
+    run: async (
+        payload: ClassifyIntentPayload
+    ): Promise<IntentClassification> => {
         const result = await classifyIntent({
             messageContent: payload.messageContent,
             conversationContext: payload.conversationContext,

@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import { Eye, EyeOff, Check, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 
 interface PasswordFieldProps {
     id?: string

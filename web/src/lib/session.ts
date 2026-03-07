@@ -1,7 +1,7 @@
 import { cache } from "react"
 import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
-import { getTenantByOwnerId } from "@/lib/data/tenants"
+import { getTenantByOwnerId } from "@/data/tenants"
 
 export const getSession = cache(async () => {
     return await auth.api.getSession({

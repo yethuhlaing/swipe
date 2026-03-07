@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { ChevronRight } from "lucide-react"
 import { LogoImage } from "@/components/shared/logo-image"
-import { navbarConfig } from "@/config/navbar.config"
+import { navbarConfig } from "@/config/navbar"
 import { signOut } from "@/lib/auth-client"
 import {
     Sidebar,

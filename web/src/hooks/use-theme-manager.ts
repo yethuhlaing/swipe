@@ -2,8 +2,8 @@
 
 import { useMemo, useState, useCallback } from "react"
 import { useTheme } from "@/hooks/use-theme"
-import { baseColors } from "@/config/theme-customizer-constants"
-import { colorThemes } from "@/config/theme-data"
+import { baseColors } from "@/config/customizer"
+import { colorThemes } from "@/config/theme"
 import type { ThemePreset, ImportedTheme } from "@/types/theme-customizer"
 
 export function useThemeManager() {

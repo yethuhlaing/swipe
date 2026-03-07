@@ -10,7 +10,7 @@ import {
     type BuyerStageHistory,
 } from "@/db/schema"
 import { eq, and, desc, asc, sql, ilike, or } from "drizzle-orm"
-import type { BuyerWithStage, BuyerListParams } from "@/lib/dto"
+import type { BuyerWithStage, BuyerListParams } from "@/dto/buyer"
 
 export type { BuyerWithStage, BuyerListParams }
 
@@ -58,7 +58,12 @@ export async function getBuyerByInstagramId(
     const [buyer] = await db
         .select()
         .from(buyers)
-        .where(and(eq(buyers.tenantId, tenantId), eq(buyers.instagramId, instagramId)))
+        .where(
+            and(
+                eq(buyers.tenantId, tenantId),
+                eq(buyers.instagramId, instagramId)
+            )
+        )
         .limit(1)
 
     return buyer ?? null
@@ -161,7 +166,10 @@ export async function getBuyersByStage(
         .from(buyers)
         .leftJoin(pipelineStages, eq(pipelineStages.id, buyers.currentStageId))
         .where(
-            and(eq(buyers.tenantId, tenantId), eq(buyers.currentStageId, stageId))
+            and(
+                eq(buyers.tenantId, tenantId),
+                eq(buyers.currentStageId, stageId)
+            )
         )
         .orderBy(desc(buyers.lastActivityAt))
 
@@ -180,7 +188,10 @@ export async function getBuyerStageHistory(
             stageName: pipelineStages.name,
         })
         .from(buyerStageHistory)
-        .innerJoin(pipelineStages, eq(pipelineStages.id, buyerStageHistory.stageId))
+        .innerJoin(
+            pipelineStages,
+            eq(pipelineStages.id, buyerStageHistory.stageId)
+        )
         .where(eq(buyerStageHistory.buyerId, buyerId))
         .orderBy(desc(buyerStageHistory.enteredAt))
 

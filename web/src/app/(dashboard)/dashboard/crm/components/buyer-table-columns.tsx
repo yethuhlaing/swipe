@@ -15,7 +15,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { DataTableColumnHeader } from "./data-table-column-header"
-import type { BuyerWithStage } from "@/lib/dto"
+import type { BuyerWithStage } from "@/dto/buyer"
 
 export function getBuyerTableColumns(): ColumnDef<BuyerWithStage>[] {
     return [
@@ -43,11 +43,12 @@ export function getBuyerTableColumns(): ColumnDef<BuyerWithStage>[] {
                             <span className="font-medium truncate">
                                 {username}
                             </span>
-                            {b.instagramName && b.instagramName !== username && (
-                                <span className="text-xs text-muted-foreground truncate">
-                                    {b.instagramName}
-                                </span>
-                            )}
+                            {b.instagramName &&
+                                b.instagramName !== username && (
+                                    <span className="text-xs text-muted-foreground truncate">
+                                        {b.instagramName}
+                                    </span>
+                                )}
                         </div>
                     </div>
                 )
@@ -76,7 +77,8 @@ export function getBuyerTableColumns(): ColumnDef<BuyerWithStage>[] {
             ),
             cell: ({ row }) => {
                 const stage = row.original.stage
-                if (!stage) return <span className="text-muted-foreground">—</span>
+                if (!stage)
+                    return <span className="text-muted-foreground">—</span>
                 return (
                     <Badge variant="secondary" className="font-normal">
                         {stage.name}
@@ -93,11 +95,10 @@ export function getBuyerTableColumns(): ColumnDef<BuyerWithStage>[] {
             ),
             cell: ({ row }) => {
                 const score = row.getValue("buyerScore") as number | null
-                if (score == null) return <span className="text-muted-foreground">—</span>
+                if (score == null)
+                    return <span className="text-muted-foreground">—</span>
                 return (
-                    <span className="tabular-nums font-medium">
-                        {score}/10
-                    </span>
+                    <span className="tabular-nums font-medium">{score}/10</span>
                 )
             },
         },
@@ -108,10 +109,13 @@ export function getBuyerTableColumns(): ColumnDef<BuyerWithStage>[] {
             ),
             cell: ({ row }) => {
                 const date = row.getValue("lastActivityAt") as Date | null
-                if (!date) return <span className="text-muted-foreground">—</span>
+                if (!date)
+                    return <span className="text-muted-foreground">—</span>
                 return (
                     <span className="text-muted-foreground text-sm">
-                        {formatDistanceToNow(new Date(date), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(date), {
+                            addSuffix: true,
+                        })}
                     </span>
                 )
             },
@@ -123,7 +127,8 @@ export function getBuyerTableColumns(): ColumnDef<BuyerWithStage>[] {
             ),
             cell: ({ row }) => {
                 const tags = (row.original.tags ?? []) as string[]
-                if (tags.length === 0) return <span className="text-muted-foreground">—</span>
+                if (tags.length === 0)
+                    return <span className="text-muted-foreground">—</span>
                 return (
                     <div className="flex flex-wrap gap-1 max-w-[200px]">
                         {tags.slice(0, 3).map((tag) => (
@@ -136,7 +141,10 @@ export function getBuyerTableColumns(): ColumnDef<BuyerWithStage>[] {
                             </Badge>
                         ))}
                         {tags.length > 3 && (
-                            <Badge variant="outline" className="text-xs font-normal">
+                            <Badge
+                                variant="outline"
+                                className="text-xs font-normal"
+                            >
                                 +{tags.length - 3}
                             </Badge>
                         )}
@@ -161,13 +169,21 @@ export function getBuyerTableColumns(): ColumnDef<BuyerWithStage>[] {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-[160px]">
-                            <DropdownMenuItem asChild className="cursor-pointer">
+                            <DropdownMenuItem
+                                asChild
+                                className="cursor-pointer"
+                            >
                                 <Link href={`/dashboard/crm/${buyer.id}`}>
                                     View details
                                 </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem asChild className="cursor-pointer">
-                                <Link href={`/dashboard/chat?buyer=${buyer.id}`}>
+                            <DropdownMenuItem
+                                asChild
+                                className="cursor-pointer"
+                            >
+                                <Link
+                                    href={`/dashboard/chat?buyer=${buyer.id}`}
+                                >
                                     Open thread
                                 </Link>
                             </DropdownMenuItem>

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -65,7 +65,9 @@ export function SignupForm2({
                 name: `${firstName} ${lastName}`,
                 callbackURL: "/auth/verify-success", // Redirect to success page after email verification
             })
-            toast.success("Account created! Please check your email to verify your account.")
+            toast.success(
+                "Account created! Please check your email to verify your account."
+            )
             // Redirect to the "check your email" page
             router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`)
         } catch (error) {

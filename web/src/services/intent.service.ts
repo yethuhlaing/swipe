@@ -1,6 +1,6 @@
 import { generateText, Output } from "ai"
 import { z } from "zod"
-import { getModel, type TokenUsage } from "./client"
+import { getModel, type TokenUsage } from "../lib/ai/openai"
 
 /**
  * Intent Classification
@@ -24,7 +24,11 @@ export type MessageIntent = z.infer<typeof MessageIntentSchema>
 
 export const IntentClassificationSchema = z.object({
     intent: MessageIntentSchema,
-    confidence: z.number().min(0).max(1).describe("Confidence level between 0 and 1"),
+    confidence: z
+        .number()
+        .min(0)
+        .max(1)
+        .describe("Confidence level between 0 and 1"),
     suggestedStage: z
         .enum([
             "cold-outreach",
@@ -37,7 +41,10 @@ export const IntentClassificationSchema = z.object({
         ])
         .optional()
         .describe("Suggested pipeline stage for the buyer"),
-    reasoning: z.string().optional().describe("Brief explanation for the classification"),
+    reasoning: z
+        .string()
+        .optional()
+        .describe("Brief explanation for the classification"),
 })
 
 export type IntentClassification = z.infer<typeof IntentClassificationSchema>
@@ -69,7 +76,9 @@ Also suggest which pipeline stage the buyer should be in:
 - "paid": Order has been paid
 - "reorder": In reorder cycle`
 
-export async function classifyIntent(input: ClassifyIntentInput): Promise<IntentClassification> {
+export async function classifyIntent(
+    input: ClassifyIntentInput
+): Promise<IntentClassification> {
     const contextMessages = input.conversationContext?.previousMessages
         ?.slice(-5)
         .map((m) => `${m.role === "buyer" ? "Buyer" : "Brand"}: ${m.content}`)
@@ -158,7 +167,9 @@ Do NOT include:
 
 Respond with ONLY the message text, nothing else.`
 
-export async function generateDraftReply(input: GenerateDraftInput): Promise<DraftReplyResult> {
+export async function generateDraftReply(
+    input: GenerateDraftInput
+): Promise<DraftReplyResult> {
     const contextMessages = input.conversationHistory
         .slice(-6)
         .map((m) => `${m.role === "buyer" ? "Buyer" : "Brand"}: ${m.content}`)
@@ -166,8 +177,10 @@ export async function generateDraftReply(input: GenerateDraftInput): Promise<Dra
 
     const buyerInfo = [
         input.buyerContext.name && `Name: ${input.buyerContext.name}`,
-        input.buyerContext.storeName && `Store: ${input.buyerContext.storeName}`,
-        input.buyerContext.storeType && `Store type: ${input.buyerContext.storeType}`,
+        input.buyerContext.storeName &&
+            `Store: ${input.buyerContext.storeName}`,
+        input.buyerContext.storeType &&
+            `Store type: ${input.buyerContext.storeType}`,
     ]
         .filter(Boolean)
         .join("\n")
@@ -201,7 +214,8 @@ Generate a draft reply:`
                 ? {
                       promptTokens: usage.inputTokens ?? 0,
                       completionTokens: usage.outputTokens ?? 0,
-                      totalTokens: (usage.inputTokens ?? 0) + (usage.outputTokens ?? 0),
+                      totalTokens:
+                          (usage.inputTokens ?? 0) + (usage.outputTokens ?? 0),
                   }
                 : undefined,
         }
@@ -224,7 +238,8 @@ function getDefaultReply(intent: MessageIntent): string {
         reorder_confirm:
             "Awesome! I'll put together your reorder now. Would you like the same items as last time, or would you like to make any changes?",
         general: "Thanks for your message! How can I help you today?",
-        unknown: "Thanks for reaching out! How can I help you with your wholesale needs?",
+        unknown:
+            "Thanks for reaching out! How can I help you with your wholesale needs?",
     }
 
     return defaults[intent]

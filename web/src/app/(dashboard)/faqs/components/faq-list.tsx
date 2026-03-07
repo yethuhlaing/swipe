@@ -11,7 +11,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion"
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 import { Search } from "lucide-react"
 
 interface FAQ {

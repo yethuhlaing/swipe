@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
-import { createTenant } from "@/lib/services"
+import { createTenant } from "@/services/tenant.service"
 import {
     getTenantsByUserId,
     getTenantById,
@@ -13,7 +13,7 @@ import {
     connectShopify,
     disconnectInstagram,
     disconnectShopify,
-} from "@/lib/data/tenants"
+} from "@/data/tenants"
 
 /**
  * Tenant Server Actions

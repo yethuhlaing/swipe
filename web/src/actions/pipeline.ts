@@ -4,8 +4,8 @@ import { headers } from "next/headers"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { auth } from "@/lib/auth"
-import { getTenantById } from "@/lib/data/tenants"
-import { updatePipelineStage } from "@/lib/data/pipeline"
+import { getTenantById } from "@/data/tenants"
+import { updatePipelineStage } from "@/data/pipeline"
 
 const updatePipelineStageSchema = z.object({
     name: z.string().min(1, "Stage name is required").max(120),
@@ -55,7 +55,11 @@ export async function updatePipelineStageAction(
     }
 
     try {
-        const updated = await updatePipelineStage(tenantId, stageId, validation.data)
+        const updated = await updatePipelineStage(
+            tenantId,
+            stageId,
+            validation.data
+        )
         if (!updated) {
             return { success: false, error: "Stage not found" }
         }

@@ -13,8 +13,8 @@ import {
     removeTagFromBuyer,
     disqualifyBuyer,
     type BuyerListParams,
-} from "@/lib/services"
-import { getTenantById } from "@/lib/data/tenants"
+} from "@/services/buyer.service"
+import { getTenantById } from "@/data/tenants"
 
 /**
  * Buyer Server Actions

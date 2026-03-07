@@ -5,9 +5,9 @@ import { format } from "date-fns"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { MessageSquare } from "lucide-react"
-import type { BuyerWithStage } from "@/lib/dto"
+import type { BuyerWithStage } from "@/dto/buyer"
 import type { Message } from "@/db/schema"
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 
 interface BuyerMessagesTabProps {
     messages: Message[]
@@ -23,7 +23,12 @@ export function BuyerMessagesTab({ messages, buyer }: BuyerMessagesTabProps) {
                     <p className="text-muted-foreground text-sm">
                         No messages in this thread yet.
                     </p>
-                    <Button variant="outline" size="sm" className="mt-3" asChild>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-3"
+                        asChild
+                    >
                         <Link href={`/dashboard/chat?buyer=${buyer.id}`}>
                             Open in Inbox
                         </Link>
@@ -66,7 +71,10 @@ export function BuyerMessagesTab({ messages, buyer }: BuyerMessagesTabProps) {
                                         : "text-muted-foreground"
                                 )}
                             >
-                                {format(new Date(msg.createdAt), "MMM d, yyyy HH:mm")}
+                                {format(
+                                    new Date(msg.createdAt),
+                                    "MMM d, yyyy HH:mm"
+                                )}
                                 {msg.direction === "outbound" ? " · You" : ""}
                             </p>
                         </div>

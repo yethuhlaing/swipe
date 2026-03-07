@@ -45,7 +45,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 import { type CalendarEvent } from "../types"
 
 // Import data

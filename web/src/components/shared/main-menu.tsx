@@ -1,6 +1,6 @@
 "use client"
 
-import { menuSections } from "@/config/menu.config"
+import { menuSections } from "@/config/menu"
 import { useSession } from "@/lib/auth-client"
 import Link from "next/link"
 import { LayoutDashboard } from "lucide-react"
