@@ -13,7 +13,7 @@ import {
     removeTagFromBuyer,
     disqualifyBuyer,
     type BuyerListParams,
-} from "@/lib/data/buyers"
+} from "@/lib/services"
 import { getTenantById } from "@/lib/data/tenants"
 
 /**

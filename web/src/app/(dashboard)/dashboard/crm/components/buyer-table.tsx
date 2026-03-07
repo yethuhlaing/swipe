@@ -29,7 +29,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Settings2 } from "lucide-react"
-import type { BuyerWithStage } from "@/lib/data/buyers"
+import type { BuyerWithStage } from "@/lib/dto"
 import type { PipelineStage } from "@/db/schema"
 import { getBuyerTableColumns } from "./buyer-table-columns"
 import { BuyerFilters } from "./buyer-filters"

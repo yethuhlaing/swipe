@@ -5,7 +5,7 @@ import { TrendingDown, TrendingUp } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import type { AiDraftMetrics } from "@/lib/data/analytics"
+import type { AiDraftMetrics } from "@/lib/dto"
 
 type AiPerformanceProps = {
     metrics: AiDraftMetrics

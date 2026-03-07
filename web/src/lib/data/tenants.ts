@@ -57,41 +57,41 @@ export async function getTenantsByUserId(userId: string): Promise<Tenant[]> {
 // Mutations
 // ============================================================================
 
-export async function createTenant(data: {
+/** Single insert; returns the created tenant. */
+export async function insertTenant(data: {
     name: string
     ownerId: string
-    slug?: string
+    slug: string
 }): Promise<Tenant> {
-    // Generate slug from name if not provided
-    const slug = data.slug ?? generateSlug(data.name)
-
-    // Create tenant
     const [tenant] = await db
         .insert(tenants)
         .values({
             name: data.name,
             ownerId: data.ownerId,
-            slug,
+            slug: data.slug,
         })
         .returning()
-
-    // Add owner as member
-    await db.insert(tenantMembers).values({
-        tenantId: tenant.id,
-        userId: data.ownerId,
-        role: "owner",
-    })
-
-    // Initialize default pipeline stages
-    await initializeDefaultPipelineStages(tenant.id)
-
-    // Initialize default price tiers
-    await initializeDefaultPriceTiers(tenant.id)
-
-    // Initialize default templates
-    await initializeDefaultTemplates(tenant.id)
-
     return tenant
+}
+
+/** Add a member to a tenant. */
+export async function addTenantMember(
+    tenantId: string,
+    userId: string,
+    role: "owner" | "admin" | "member"
+): Promise<void> {
+    await db.insert(tenantMembers).values({
+        tenantId,
+        userId,
+        role,
+    })
+}
+
+/** Initialize default pipeline stages, price tiers, and templates for a new tenant. */
+export async function initializeDefaultsForTenant(tenantId: string): Promise<void> {
+    await initializeDefaultPipelineStages(tenantId)
+    await initializeDefaultPriceTiers(tenantId)
+    await initializeDefaultTemplates(tenantId)
 }
 
 export async function updateTenant(
@@ -155,16 +155,8 @@ export async function disconnectShopify(tenantId: string): Promise<Tenant | null
 }
 
 // ============================================================================
-// Helpers
+// Helpers (used by initializeDefaultsForTenant)
 // ============================================================================
-
-function generateSlug(name: string): string {
-    return name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")
-        .slice(0, 50)
-}
 
 async function initializeDefaultPipelineStages(tenantId: string) {
     const stagesToInsert = DEFAULT_PIPELINE_STAGES.map((stage) => ({

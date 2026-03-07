@@ -7,7 +7,7 @@ import { formatDistanceToNow } from "date-fns"
 import { GripVertical } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { QuickActions } from "./quick-actions"
-import type { BuyerWithStage } from "@/lib/data/buyers"
+import type { BuyerWithStage } from "@/lib/dto"
 
 interface BuyerCardProps {
     buyer: BuyerWithStage

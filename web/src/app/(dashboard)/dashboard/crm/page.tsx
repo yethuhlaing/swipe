@@ -3,7 +3,7 @@ import { getCurrentTenant } from "@/lib/session"
 import { listPipelineStages } from "@/lib/data/pipeline"
 import { listBuyers } from "@/lib/data/buyers"
 import { BuyerTable } from "./components/buyer-table"
-import type { BuyerWithStage } from "@/lib/data/buyers"
+import type { BuyerWithStage } from "@/lib/dto"
 import type { PipelineStage } from "@/db/schema"
 
 const DEFAULT_PAGE_SIZE = 20

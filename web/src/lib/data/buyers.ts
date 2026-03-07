@@ -10,36 +10,15 @@ import {
     type BuyerStageHistory,
 } from "@/db/schema"
 import { eq, and, desc, asc, sql, ilike, or } from "drizzle-orm"
+import type { BuyerWithStage, BuyerListParams } from "@/lib/dto"
+
+export type { BuyerWithStage, BuyerListParams }
 
 /**
  * Buyer Data Access Layer
  *
- * All buyer-related database operations.
+ * Pure DB: queries and simple writes only.
  */
-
-// ============================================================================
-// Types
-// ============================================================================
-
-export type BuyerWithStage = Buyer & {
-    stage?: {
-        id: string
-        name: string
-        slug: string
-        position: number
-    }
-}
-
-export type BuyerListParams = {
-    tenantId: string
-    stageId?: string
-    search?: string
-    tags?: string[]
-    limit?: number
-    offset?: number
-    orderBy?: "lastActivity" | "createdAt" | "storeName" | "buyerScore"
-    orderDir?: "asc" | "desc"
-}
 
 // ============================================================================
 // Queries
@@ -236,114 +215,39 @@ export async function updateBuyer(
     return updated ?? null
 }
 
-export async function moveBuyerToStage(
+/** Close the open stage history row for a buyer (set exitedAt, durationSeconds). */
+export async function closeBuyerStageHistory(
+    buyerId: string,
+    stageId: string,
+    exitedAt: Date,
+    durationSeconds: number
+): Promise<void> {
+    await db
+        .update(buyerStageHistory)
+        .set({
+            exitedAt,
+            durationSeconds,
+        })
+        .where(
+            and(
+                eq(buyerStageHistory.buyerId, buyerId),
+                eq(buyerStageHistory.stageId, stageId),
+                sql`${buyerStageHistory.exitedAt} IS NULL`
+            )
+        )
+}
+
+/** Insert a new stage history row when buyer enters a stage. */
+export async function insertBuyerStageHistory(
     tenantId: string,
     buyerId: string,
-    newStageId: string
-): Promise<Buyer | null> {
-    // Get current stage
-    const [buyer] = await db
-        .select()
-        .from(buyers)
-        .where(and(eq(buyers.tenantId, tenantId), eq(buyers.id, buyerId)))
-        .limit(1)
-
-    if (!buyer) return null
-
-    const previousStageId = buyer.currentStageId
-    const now = new Date()
-
-    // Close previous stage history entry
-    if (previousStageId) {
-        const stageEnteredAt = buyer.stageEnteredAt ?? buyer.createdAt
-        const durationSeconds = Math.floor(
-            (now.getTime() - stageEnteredAt.getTime()) / 1000
-        )
-
-        await db
-            .update(buyerStageHistory)
-            .set({
-                exitedAt: now,
-                durationSeconds,
-            })
-            .where(
-                and(
-                    eq(buyerStageHistory.buyerId, buyerId),
-                    eq(buyerStageHistory.stageId, previousStageId),
-                    sql`${buyerStageHistory.exitedAt} IS NULL`
-                )
-            )
-    }
-
-    // Create new stage history entry
+    stageId: string,
+    enteredAt: Date
+): Promise<void> {
     await db.insert(buyerStageHistory).values({
         tenantId,
         buyerId,
-        stageId: newStageId,
-        enteredAt: now,
-    })
-
-    // Update buyer
-    const [updated] = await db
-        .update(buyers)
-        .set({
-            currentStageId: newStageId,
-            stageEnteredAt: now,
-            updatedAt: now,
-        })
-        .where(eq(buyers.id, buyerId))
-        .returning()
-
-    return updated ?? null
-}
-
-export async function addTagToBuyer(
-    tenantId: string,
-    buyerId: string,
-    tag: string
-): Promise<Buyer | null> {
-    const [buyer] = await db
-        .select()
-        .from(buyers)
-        .where(and(eq(buyers.tenantId, tenantId), eq(buyers.id, buyerId)))
-        .limit(1)
-
-    if (!buyer) return null
-
-    const currentTags = (buyer.tags ?? []) as string[]
-    if (currentTags.includes(tag)) return buyer
-
-    return updateBuyer(tenantId, buyerId, {
-        tags: [...currentTags, tag],
-    })
-}
-
-export async function removeTagFromBuyer(
-    tenantId: string,
-    buyerId: string,
-    tag: string
-): Promise<Buyer | null> {
-    const [buyer] = await db
-        .select()
-        .from(buyers)
-        .where(and(eq(buyers.tenantId, tenantId), eq(buyers.id, buyerId)))
-        .limit(1)
-
-    if (!buyer) return null
-
-    const currentTags = (buyer.tags ?? []) as string[]
-    return updateBuyer(tenantId, buyerId, {
-        tags: currentTags.filter((t) => t !== tag),
-    })
-}
-
-export async function disqualifyBuyer(
-    tenantId: string,
-    buyerId: string,
-    reason?: string
-): Promise<Buyer | null> {
-    return updateBuyer(tenantId, buyerId, {
-        isDisqualified: true,
-        disqualifiedReason: reason,
+        stageId,
+        enteredAt,
     })
 }

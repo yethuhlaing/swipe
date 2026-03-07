@@ -1,12 +1,8 @@
 /**
  * Data Access Layer
  *
- * Centralized data access functions for all domain entities.
- * Use these instead of direct db queries for:
- * - Consistent multi-tenancy enforcement
- * - Reusable query patterns
- * - Type-safe operations
- * - Business logic encapsulation
+ * Pure DB: single-purpose queries and simple writes only.
+ * Business logic and orchestration live in lib/services.
  */
 
 export * from "./tenants"

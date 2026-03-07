@@ -12,7 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import type { RevenueTrendDatum } from "@/lib/data/analytics"
+import type { RevenueTrendDatum } from "@/lib/dto"
 
 type RevenueChartProps = {
     data: RevenueTrendDatum[]

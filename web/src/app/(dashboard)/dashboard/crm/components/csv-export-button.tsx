@@ -4,7 +4,7 @@ import { useCallback } from "react"
 import { Download } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import type { BuyerWithStage } from "@/lib/data/buyers"
+import type { BuyerWithStage } from "@/lib/dto"
 
 interface CsvExportButtonProps {
     buyers: BuyerWithStage[]

@@ -10,7 +10,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import type { RevenueMetrics, TopLevelMetrics } from "@/lib/data/analytics"
+import type { RevenueMetrics, TopLevelMetrics } from "@/lib/dto"
 
 type MetricCardsProps = {
     metrics: TopLevelMetrics

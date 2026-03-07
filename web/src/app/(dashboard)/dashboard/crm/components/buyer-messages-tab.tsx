@@ -5,7 +5,7 @@ import { format } from "date-fns"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { MessageSquare } from "lucide-react"
-import type { BuyerWithStage } from "@/lib/data/buyers"
+import type { BuyerWithStage } from "@/lib/dto"
 import type { Message } from "@/db/schema"
 import { cn } from "@/lib/utils"
 

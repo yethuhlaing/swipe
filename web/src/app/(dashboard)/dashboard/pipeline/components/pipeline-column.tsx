@@ -3,7 +3,7 @@
 import { useDroppable } from "@dnd-kit/core"
 import { cn } from "@/lib/utils"
 import { BuyerCard } from "./buyer-card"
-import type { BuyerWithStage } from "@/lib/data/buyers"
+import type { BuyerWithStage } from "@/lib/dto"
 import type { PipelineStage } from "@/db/schema"
 
 interface PipelineColumnProps {

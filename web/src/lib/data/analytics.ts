@@ -2,54 +2,22 @@ import { cache } from "react"
 import { and, asc, eq, gte, lt, sql } from "drizzle-orm"
 import { db } from "@/db"
 import { aiDrafts, buyers, orders, pipelineStages } from "@/db/schema"
+import type {
+    DateRangeInput,
+    FunnelStageDatum,
+    RevenueMetrics,
+    RevenueTrendDatum,
+    AiDraftMetrics,
+    TopLevelMetrics,
+} from "@/lib/dto/analytics"
 
-export type DateRangeInput = {
-    startDate: Date
-    endDate: Date
-}
-
-export type FunnelStageDatum = {
-    stageId: string
-    stageName: string
-    slug: string
-    color: string
-    position: number
-    count: number
-    conversionFromPrev: number | null
-}
-
-export type RevenueMetrics = {
-    gmv: number
-    orderCount: number
-    aov: number
-    reorderCount: number
-    reorderRate: number
-    gmvChangePct: number
-    orderCountChangePct: number
-    aovChangePct: number
-    reorderRateChangePct: number
-}
-
-export type RevenueTrendDatum = {
-    date: string
-    revenue: number
-    orderCount: number
-}
-
-export type AiDraftMetrics = {
-    totalDrafts: number
-    approvedCount: number
-    rejectedCount: number
-    editedCount: number
-    approvalRate: number
-    approvalRateChangePct: number
-}
-
-export type TopLevelMetrics = {
-    gmv: { value: number; changePct: number }
-    orders: { value: number; changePct: number }
-    activeBuyers: { value: number; changePct: number }
-    aiApprovalRate: { value: number; changePct: number }
+export type {
+    DateRangeInput,
+    FunnelStageDatum,
+    RevenueMetrics,
+    RevenueTrendDatum,
+    AiDraftMetrics,
+    TopLevelMetrics,
 }
 
 function getPreviousRange({ startDate, endDate }: DateRangeInput): DateRangeInput {

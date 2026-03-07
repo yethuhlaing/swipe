@@ -15,7 +15,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { DataTableColumnHeader } from "./data-table-column-header"
-import type { BuyerWithStage } from "@/lib/data/buyers"
+import type { BuyerWithStage } from "@/lib/dto"
 
 export function getBuyerTableColumns(): ColumnDef<BuyerWithStage>[] {
     return [

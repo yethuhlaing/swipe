@@ -2,7 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MessageSquare, FileText, ShoppingBag, User } from "lucide-react"
-import type { BuyerWithStage } from "@/lib/data/buyers"
+import type { BuyerWithStage } from "@/lib/dto"
 import type { PipelineStage } from "@/db/schema"
 import type { Message } from "@/db/schema"
 import type { Order } from "@/db/schema"

@@ -12,7 +12,7 @@ import {
 import { PipelineColumn } from "./pipeline-column"
 import { moveBuyerToStageAction } from "@/actions/buyer"
 import { toast } from "sonner"
-import type { BuyerWithStage } from "@/lib/data/buyers"
+import type { BuyerWithStage } from "@/lib/dto"
 import type { PipelineStage } from "@/db/schema"
 
 interface PipelineBoardProps {

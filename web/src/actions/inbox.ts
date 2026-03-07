@@ -7,7 +7,7 @@ import { db } from "@/db"
 import { aiDrafts, messages, conversations, buyers } from "@/db/schema"
 import { eq, and, desc } from "drizzle-orm"
 import { getTenantById } from "@/lib/data/tenants"
-import { moveBuyerToStage } from "@/lib/data/buyers"
+import { moveBuyerToStage } from "@/lib/services"
 import { triggerTask } from "@/trigger/client"
 
 /**
