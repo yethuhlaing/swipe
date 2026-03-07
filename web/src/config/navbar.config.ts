@@ -1,6 +1,7 @@
 import {
     LayoutPanelLeft,
     LayoutDashboard,
+    BarChart3,
     Mail,
     CheckSquare,
     MessageCircle,
@@ -31,6 +32,11 @@ export const navbarConfig = {
                     title: "Buyers",
                     url: "/dashboard/crm",
                     icon: Users,
+                },
+                {
+                    title: "Analytics",
+                    url: "/dashboard/analytics",
+                    icon: BarChart3,
                 },
                 {
                     title: "Dashboard 1",
@@ -91,6 +97,14 @@ export const navbarConfig = {
                             url: "/settings/account",
                         },
                         {
+                            title: "Integrations",
+                            url: "/settings/integrations",
+                        },
+                        {
+                            title: "Pipeline Config",
+                            url: "/settings/pipeline",
+                        },
+                        {
                             title: "Plans & Billing",
                             url: "/settings/billing",
                         },
@@ -99,7 +113,7 @@ export const navbarConfig = {
                             url: "/settings/notifications",
                         },
                         {
-                            title: "Connections",
+                            title: "Connections (Legacy)",
                             url: "/settings/connections",
                         },
                     ],

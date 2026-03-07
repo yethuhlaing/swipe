@@ -22,3 +22,30 @@ export async function listPipelineStages(
         )
         .orderBy(asc(pipelineStages.position))
 }
+
+export async function updatePipelineStage(
+    tenantId: string,
+    stageId: string,
+    data: {
+        name?: string
+        color?: string
+        aiConfidenceThreshold?: number
+    }
+): Promise<PipelineStage | null> {
+    const [updated] = await db
+        .update(pipelineStages)
+        .set({
+            ...data,
+            updatedAt: new Date(),
+        })
+        .where(
+            and(
+                eq(pipelineStages.id, stageId),
+                eq(pipelineStages.tenantId, tenantId),
+                eq(pipelineStages.isActive, true)
+            )
+        )
+        .returning()
+
+    return updated ?? null
+}

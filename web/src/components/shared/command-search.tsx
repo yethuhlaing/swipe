@@ -19,7 +19,7 @@ import {
     User,
     Bell,
     Link2,
-    Palette,
+    Kanban,
     type LucideIcon,
 } from "lucide-react"
 
@@ -216,6 +216,18 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
             icon: Settings,
         },
         {
+            title: "Integrations",
+            url: "/settings/integrations",
+            group: "Settings",
+            icon: Link2,
+        },
+        {
+            title: "Pipeline Config",
+            url: "/settings/pipeline",
+            group: "Settings",
+            icon: Kanban,
+        },
+        {
             title: "Plans & Billing",
             url: "/settings/billing",
             group: "Settings",
@@ -228,7 +240,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
             icon: Bell,
         },
         {
-            title: "Connections",
+            title: "Connections (Legacy)",
             url: "/settings/connections",
             group: "Settings",
             icon: Link2,

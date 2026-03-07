@@ -137,6 +137,23 @@ export async function connectShopify(
     })
 }
 
+export async function disconnectInstagram(tenantId: string): Promise<Tenant | null> {
+    return updateTenant(tenantId, {
+        instagramBusinessId: null,
+        instagramAccessToken: null,
+        instagramTokenExpiresAt: null,
+        instagramConnectedAt: null,
+    })
+}
+
+export async function disconnectShopify(tenantId: string): Promise<Tenant | null> {
+    return updateTenant(tenantId, {
+        shopifyShop: null,
+        shopifyAccessToken: null,
+        shopifyConnectedAt: null,
+    })
+}
+
 // ============================================================================
 // Helpers
 // ============================================================================
